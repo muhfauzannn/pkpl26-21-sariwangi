@@ -216,15 +216,20 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 
 **Teknik Mitigasi:**
 
-- Seluruh operasi database menggunakan Django ORM (`apps/authentication/services.py`, `apps/authentication/views.py`)
-- Tidak ada raw SQL query yang menggabungkan input pengguna secara langsung
+- Seluruh operasi database menggunakan Django ORM — tidak ada raw SQL
 - Django ORM otomatis menggunakan parameterized queries
-- Contoh query yang aman di authentication module:
+- Contoh query yang aman:
   ```python
-  User.objects.filter(username__iexact=username).exists()  # ORM
-  LoginAttempt.objects.filter(user__username=username, success=False).count()  # ORM
-  User.objects.create_user(username=username, password=password)  # ORM
+  # Authentication module
+  User.objects.filter(username__iexact=username).exists()
+  LoginAttempt.objects.filter(user__username=username, success=False).count()
+
+  # Voters module — semua CRUD menggunakan ORM
+  Voter.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists()
+  Voter.objects.all().order_by("-created_at")
+  voter.delete()
   ```
+- Input pengguna tidak pernah digabungkan langsung ke string query
 
 ---
 
@@ -256,6 +261,19 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 | 4  | Registrasi dengan role pengawas                | Form tidak memiliki opsi "Pengawas", request ditolak        |        |
 | 5  | Akses halaman protected tanpa login            | Diredirect ke `/auth/login/`                                |        |
 | 6  | CSRF token pada form                           | Form mengandung `csrfmiddlewaretoken`, request tanpa token ditolak (403) | |
+
+#### Test Case — Modul 2: Manajemen Data Pemilih
+
+| No | Test Case                                      | Expected Result                                             | Status |
+| -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
+| 1  | Tambah data pemilih dengan data valid          | Data tersimpan, redirect ke daftar pemilih, muncul pesan sukses |     |
+| 2  | Tambah pemilih dengan NIK kurang dari 16 digit | Muncul error "NIK harus terdiri dari 16 digit angka."       |        |
+| 3  | Tambah pemilih dengan NPM mengandung huruf     | Muncul error "NPM harus terdiri dari digit angka."          |        |
+| 4  | Tambah pemilih dengan email duplikat           | Muncul error "Email sudah digunakan oleh pemilih lain."     |        |
+| 5  | Edit data pemilih                              | Data berhasil diperbarui, pesan sukses muncul               |        |
+| 6  | Hapus data pemilih                             | Data terhapus, pesan sukses muncul                          |        |
+| 7  | Akses /voters/ oleh pemilih (non-pengawas)     | Ditolak (403 Forbidden) karena middleware RBAC              |        |
+| 8  | Input dengan karakter berbahaya (XSS attempt)  | Karakter di-escape oleh Django template, tidak dieksekusi   |        |
 
 ---
 

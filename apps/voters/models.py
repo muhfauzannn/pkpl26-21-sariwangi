@@ -11,6 +11,8 @@ class Voter(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="voter_profile",
+        null=True,
+        blank=True,
     )
     nik = models.CharField(max_length=16, unique=True)
     npm = models.CharField(max_length=15, unique=True)

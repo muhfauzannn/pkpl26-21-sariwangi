@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit Pemilih{% else %}Tambah Pemilih{% endif %} - E-Voting System{% endblock %}
+
+{% block content %}
+<div style="max-width:560px; margin:0 auto; padding-top:var(--spacing-section);">
+    <div class="card card-elevated">
+        <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Manajemen Data</p>
+        <h1 class="text-headline" style="margin-bottom:var(--spacing-xl);">
+            {% if form.instance.pk %}Edit Pemilih{% else %}Tambah Pemilih{% endif %}
+        </h1>
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-error">
+                    {{ error }}
+                    <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_full_name" class="form-label">Nama Lengkap</label>
+                <input type="text" name="full_name" id="id_full_name"
+                       class="form-input {% if form.full_name.errors %}is-invalid{% endif %}"
+                       value="{{ form.full_name.value|default:'' }}" required>
+                {% for error in form.full_name.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_nik" class="form-label">NIK</label>
+                    <input type="text" name="nik" id="id_nik" maxlength="16"
+                           class="form-input {% if form.nik.errors %}is-invalid{% endif %}"
+                           value="{{ form.nik.value|default:'' }}" placeholder="16 digit NIK" required>
+                    {% for error in form.nik.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <label for="id_npm" class="form-label">NPM</label>
+                    <input type="text" name="npm" id="id_npm" maxlength="15"
+                           class="form-input {% if form.npm.errors %}is-invalid{% endif %}"
+                           value="{{ form.npm.value|default:'' }}" placeholder="NPM" required>
+                    {% for error in form.npm.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_email" class="form-label">Email</label>
+                <input type="email" name="email" id="id_email"
+                       class="form-input {% if form.email.errors %}is-invalid{% endif %}"
+                       value="{{ form.email.value|default:'' }}" required>
+                {% for error in form.email.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_faculty" class="form-label">Fakultas</label>
+                    <input type="text" name="faculty" id="id_faculty"
+                           class="form-input"
+                           value="{{ form.faculty.value|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_study_program" class="form-label">Program Studi</label>
+                    <input type="text" name="study_program" id="id_study_program"
+                           class="form-input"
+                           value="{{ form.study_program.value|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_status" class="form-label">Status</label>
+                <select name="status" id="id_status" class="form-select">
+                    {% for value, label in form.fields.status.choices %}
+                        <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display:flex; gap:var(--spacing-sm); margin-top:var(--spacing-lg);">
+                <button type="submit" class="btn btn-primary">Simpan</button>
+                <a href="{% url 'voters:list' %}" class="btn btn-secondary">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

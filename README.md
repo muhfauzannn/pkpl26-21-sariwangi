@@ -35,7 +35,7 @@ Pengantar Keamanan Perangkat Lunak — Genap 2025/2026
 | ----------------- | ---------------------- |
 | Backend Framework | Django                 |
 | Database          | SQLite                 |
-| Frontend          | HTML, CSS, Bootstrap 5 |
+| Frontend          | HTML, CSS, Inter + JetBrains Mono |
 | Authentication    | Session-based          |
 | Password Hashing  | PBKDF2                 |
 | ORM               | Django ORM             |
@@ -72,11 +72,17 @@ class LoginForm(forms.Form):
 
 **Teknik Mitigasi:**
 
-- Seluruh input pengguna divalidasi melalui Django Forms (`apps/authentication/forms.py`)
-- Username: divalidasi dengan `UnicodeUsernameValidator`, dicek uniqueness (case-insensitive), di-strip whitespace
-- Email: divalidasi format email (`EmailField`), dicek uniqueness (case-insensitive)
-- Password: konfirmasi password wajib cocok, divalidasi melalui Django password validators
-- Role: dibatasi hanya pilihan yang valid (allowlist, bukan free text)
+- Seluruh input pengguna divalidasi melalui Django Forms
+- **Authentication module** (`apps/authentication/forms.py`):
+  - Username: divalidasi dengan `UnicodeUsernameValidator`, dicek uniqueness (case-insensitive), di-strip whitespace
+  - Email: divalidasi format email (`EmailField`), dicek uniqueness (case-insensitive)
+  - Password: konfirmasi password wajib cocok, divalidasi melalui Django password validators
+  - Role: dibatasi hanya pilihan yang valid (allowlist, bukan free text)
+- **Voters module** (`apps/voters/forms.py`):
+  - NIK: validasi regex 16 digit angka (`^\d{16}$`)
+  - NPM: validasi hanya digit angka
+  - Email: validasi format + uniqueness (case-insensitive, exclude self on update)
+  - Semua field teks di-strip whitespace (`clean_full_name`, `clean_faculty`, dll)
 - Django template engine otomatis melakukan HTML escaping pada output, mencegah XSS
 - Django ORM mencegah SQL injection secara otomatis
 

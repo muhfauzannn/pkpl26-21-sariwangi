@@ -8,10 +8,10 @@ class LoginForm(forms.Form):
     username = forms.CharField(
         max_length=150,
         validators=[UnicodeUsernameValidator()],
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Username"}),
+        widget=forms.TextInput(attrs={"placeholder": "Username"}),
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password"}),
+        widget=forms.PasswordInput(attrs={"placeholder": "Password"}),
     )
 
     def clean_username(self):
@@ -26,26 +26,20 @@ class RegistrationForm(forms.ModelForm):
 
     password1 = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        widget=forms.PasswordInput(),
     )
     password2 = forms.CharField(
         label="Konfirmasi Password",
-        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        widget=forms.PasswordInput(),
     )
     role = forms.ChoiceField(
         choices=PUBLIC_ROLES,
-        widget=forms.Select(attrs={"class": "form-select"}),
+        widget=forms.Select(),
     )
 
     class Meta:
         model = User
         fields = ["username", "email", "first_name", "last_name", "role"]
-        widgets = {
-            "username": forms.TextInput(attrs={"class": "form-control"}),
-            "email": forms.EmailInput(attrs={"class": "form-control"}),
-            "first_name": forms.TextInput(attrs={"class": "form-control"}),
-            "last_name": forms.TextInput(attrs={"class": "form-control"}),
-        }
 
     def clean_username(self):
         username = self.cleaned_data["username"].strip()

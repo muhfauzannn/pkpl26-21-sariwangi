@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Voting - E-Voting System{% endblock %}
+
+{% block content %}
+<div style="max-width:640px; margin:0 auto;">
+    <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Pemungutan Suara</p>
+    <h1 class="text-headline" style="margin-bottom:var(--spacing-xl);">Pilih Paslon Anda</h1>
+
+    {% if form.non_field_errors or form.candidate.errors %}
+        <div class="alert alert-error" style="margin-bottom:var(--spacing-lg);">
+            {% for error in form.candidate.errors %}{{ error }}{% endfor %}
+            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+    {% endif %}
+
+    <form method="post" id="vote-form">
+        {% csrf_token %}
+
+        {% for candidate in candidates %}
+        <div class="card" style="margin-bottom:var(--spacing-md); display:flex; align-items:flex-start; gap:var(--spacing-md);">
+            <input type="radio" name="candidate" value="{{ candidate.pk }}" id="candidate-{{ candidate.pk }}"
+                   style="margin-top:var(--spacing-sm); width:20px; height:20px; accent-color:var(--color-primary);"
+                   {% if form.candidate.value|stringformat:"s" == candidate.pk|stringformat:"s" %}checked{% endif %}>
+            <label for="candidate-{{ candidate.pk }}" style="flex:1; cursor:pointer;">
+                <div style="display:flex; align-items:center; gap:var(--spacing-sm); margin-bottom:var(--spacing-xs);">
+                    <span class="text-caption">No. {{ candidate.candidate_number }}</span>
+                    <span class="text-body-lg" style="font-weight:540;">{{ candidate.name }}</span>
+                </div>
+                <p class="text-body-sm" style="margin-bottom:var(--spacing-xs);">
+                    <strong>Visi:</strong> {{ candidate.visi|truncatechars:120 }}
+                </p>
+                <p class="text-body-sm">
+                    <strong>Misi:</strong> {{ candidate.misi|truncatechars:120 }}
+                </p>
+            </label>
+        </div>
+        {% empty %}
+        <div class="card" style="text-align:center; padding:var(--spacing-xxl); color:var(--color-hairline);">
+            Belum ada paslon yang disetujui.
+        </div>
+        {% endfor %}
+
+        {% if candidates %}
+        <button type="submit" class="btn btn-primary" style="margin-top:var(--spacing-lg);">
+            Submit Voting
+        </button>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

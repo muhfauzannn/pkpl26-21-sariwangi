@@ -1,6 +1,6 @@
 from django import forms
 
-from candidates.models import Candidate
+from apps.candidates.models import Candidate
 
 
 class VoteForm(forms.Form):

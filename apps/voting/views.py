@@ -4,7 +4,7 @@ from django.db import IntegrityError
 from django.shortcuts import redirect
 from django.views.generic import FormView, TemplateView
 
-from candidates.models import Candidate
+from apps.candidates.models import Candidate
 
 from .forms import VoteForm
 from .models import Vote

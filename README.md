@@ -198,6 +198,10 @@ def is_account_locked(username, ip_address):
   - Form pendaftaran paslon menggunakan `{% csrf_token %}`
   - Tombol approve/reject di detail page masing-masing dalam `<form method="POST">` dengan CSRF token
   - Satu paslon tidak bisa mendaftar dua kali — view mengecek `Candidate.objects.filter(user=request.user).exists()`
+- **Voting module** (`apps/voting/templates/`):
+  - Form voting menggunakan `{% csrf_token %}`
+  - Radio button selection untuk memilih paslon
+  - Submit vote hanya via POST request
 
 ---
 
@@ -240,7 +244,11 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
   # Candidates module — semua operasi menggunakan ORM
   Candidate.objects.filter(user=request.user).exists()
   Candidate.objects.filter(candidate_number__isnull=False).order_by("-candidate_number")
-  candidate.save()
+
+  # Voting module — anti double voting via unique constraint
+  Vote.objects.filter(voter=request.user).exists()
+  Vote.objects.create(voter=user, candidate=candidate)
+  Vote.objects.count()
   ```
 - Input pengguna tidak pernah digabungkan langsung ke string query
 
@@ -300,6 +308,18 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 | 6  | Pemilih mencoba akses /candidates/register/    | Ditolak (403 Forbidden) karena middleware RBAC              |        |
 | 7  | Approve/reject tanpa CSRF token                | Request ditolak (403 CSRF verification failed)             |        |
 | 8  | Paslon yang sudah diapprove di-approve lagi    | Pesan "Paslon sudah diverifikasi sebelumnya"               |        |
+
+#### Test Case — Modul 4: Pemungutan Suara
+
+| No | Test Case                                      | Expected Result                                             | Status |
+| -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
+| 1  | Pemilih submit vote untuk paslon yang disetujui | Vote tercatat, redirect ke halaman sukses                  |        |
+| 2  | Pemilih mencoba vote dua kali                  | Diredirect ke results, pesan "Anda sudah melakukan voting"  |        |
+| 3  | Paslon mencoba akses /voting/                  | Ditolak (403 Forbidden) karena middleware RBAC              |        |
+| 4  | Vote tanpa CSRF token                          | Request ditolak (403 CSRF verification failed)             |        |
+| 5  | Vote tanpa memilih paslon                      | Muncul error "Pilih salah satu paslon."                    |        |
+| 6  | Hasil voting menampilkan jumlah suara per paslon | Vote count ditampilkan dengan progress bar                |        |
+| 7  | IntegrityError saat double vote (race condition) | Ditangkap oleh try/except, pesan error ditampilkan        |        |
 
 ---
 

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Voting - E-Voting System{% endblock %}
+
+{% block content %}
+<div style="max-width:640px; margin:0 auto;">
+    <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Rekapitulasi</p>
+    <h1 class="text-headline" style="margin-bottom:var(--spacing-sm);">Hasil Voting</h1>
+    <p class="text-body-sm" style="margin-bottom:var(--spacing-xl); color:var(--color-hairline);">
+        Total suara masuk: {{ total_votes }}
+    </p>
+
+    {% for item in results %}
+    <div class="card" style="margin-bottom:var(--spacing-md);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--spacing-sm);">
+            <div>
+                <span class="text-caption">No. {{ item.candidate.candidate_number }}</span>
+                <span class="text-body-lg" style="font-weight:540; margin-left:var(--spacing-xs);">{{ item.candidate.name }}</span>
+            </div>
+            <span class="text-headline" style="color:var(--color-primary);">{{ item.vote_count }}</span>
+        </div>
+        <div style="background:var(--color-surface-soft); border-radius:var(--rounded-sm); height:8px; overflow:hidden;">
+            {% widthratio item.vote_count total_votes 100 as percent %}
+            <div style="background:var(--color-primary); height:100%; width:{% if total_votes > 0 %}{{ percent }}{% else %}0{% endif %}%; border-radius:var(--rounded-sm); transition:width 0.3s;"></div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card" style="text-align:center; padding:var(--spacing-xxl); color:var(--color-hairline);">
+        Belum ada hasil voting.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

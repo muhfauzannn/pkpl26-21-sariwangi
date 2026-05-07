@@ -31,3 +31,7 @@ media/
 # OS
 .DS_Store
 Thumbs.db
+
+/AGENTS.md
+/DESIGN.md
+/ASSIGNMENT.md

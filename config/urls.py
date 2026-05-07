@@ -7,6 +7,7 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth/", include("apps.authentication.urls")),
+    path("voters/", include("apps.voters.urls")),
 ]
 
 if settings.DEBUG:

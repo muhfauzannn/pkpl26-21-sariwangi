@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ candidate.name }} - E-Voting System{% endblock %}
+
+{% block content %}
+<div style="max-width:640px; margin:0 auto; padding-top:var(--spacing-xl);">
+    <a href="{% url 'candidates:list' %}" class="text-body-sm" style="text-decoration:none;">&larr; Kembali ke daftar paslon</a>
+
+    <div style="display:flex; align-items:center; gap:var(--spacing-lg); margin-top:var(--spacing-lg); margin-bottom:var(--spacing-xl);">
+        {% if candidate.photo %}
+            <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}"
+                 style="width:80px; height:80px; object-fit:cover; border-radius:var(--rounded-md);">
+        {% else %}
+            <div style="width:80px; height:80px; background:var(--color-surface-soft); border-radius:var(--rounded-md); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:540;">
+                {{ candidate.name|first }}
+            </div>
+        {% endif %}
+        <div>
+            {% if candidate.candidate_number %}<p class="text-caption" style="margin-bottom:var(--spacing-xxs);">Nomor {{ candidate.candidate_number }}</p>{% endif %}
+            <h1 class="text-headline">{{ candidate.name }}</h1>
+            {% if candidate.status == "pending" %}
+                <span style="background:var(--color-block-cream); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Menunggu Verifikasi</span>
+            {% elif candidate.status == "approved" %}
+                <span style="background:var(--color-block-mint); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Disetujui</span>
+            {% else %}
+                <span style="background:var(--color-block-coral); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Ditolak</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="color-block color-block-cream" style="margin-bottom:var(--spacing-lg);">
+        <h2 class="text-body-lg" style="font-weight:540; margin-bottom:var(--spacing-sm);">Visi</h2>
+        <p class="text-body">{{ candidate.visi }}</p>
+    </div>
+
+    <div class="color-block color-block-lilac" style="margin-bottom:var(--spacing-lg);">
+        <h2 class="text-body-lg" style="font-weight:540; margin-bottom:var(--spacing-sm);">Misi</h2>
+        <p class="text-body">{{ candidate.misi }}</p>
+    </div>
+
+    {% if candidate.members.exists %}
+    <div class="card" style="margin-bottom:var(--spacing-lg);">
+        <h2 class="text-body-lg" style="font-weight:540; margin-bottom:var(--spacing-md);">Anggota Paslon</h2>
+        {% for member in candidate.members.all %}
+        <div style="display:flex; align-items:center; gap:var(--spacing-sm); padding:var(--spacing-sm) 0; {% if not forloop.last %}border-bottom:1px solid var(--color-hairline-soft);{% endif %}">
+            {% if member.photo %}
+                <img src="{{ member.photo.url }}" alt="{{ member.name }}" style="width:36px; height:36px; object-fit:cover; border-radius:var(--rounded-full);">
+            {% else %}
+                <div style="width:36px; height:36px; background:var(--color-surface-soft); border-radius:var(--rounded-full); display:flex; align-items:center; justify-content:center; font-size:14px;">{{ member.name|first }}</div>
+            {% endif %}
+            <span class="text-body">{{ member.name }}</span>
+            <span class="text-body-sm" style="color:var(--color-hairline);">{{ member.role }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if user.role == "pengawas" and candidate.status == "pending" %}
+    <div style="display:flex; gap:var(--spacing-sm);">
+        <form method="post" action="{% url 'candidates:approve' candidate.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Setujui</button>
+        </form>
+        <form method="post" action="{% url 'candidates:reject' candidate.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary" style="color:var(--color-error); border:1px solid var(--color-error);">Tolak</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

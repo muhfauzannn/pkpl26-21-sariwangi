@@ -83,6 +83,11 @@ class LoginForm(forms.Form):
   - NPM: validasi hanya digit angka
   - Email: validasi format + uniqueness (case-insensitive, exclude self on update)
   - Semua field teks di-strip whitespace (`clean_full_name`, `clean_faculty`, dll)
+- **Candidates module** (`apps/candidates/forms.py`):
+  - Nama paslon: di-strip whitespace
+  - Visi: minimal 10 karakter
+  - Misi: minimal 10 karakter
+  - Anggota paslon: inline formset dengan validasi nama dan role (di-strip)
 - Django template engine otomatis melakukan HTML escaping pada output, mencegah XSS
 - Django ORM mencegah SQL injection secara otomatis
 
@@ -189,6 +194,10 @@ def is_account_locked(username, ip_address):
 - CSRF token divalidasi di sisi server sebelum memproses request
 - Logout hanya menerima POST request (bukan GET)
 - Cookie `csrfmiddlewaretoken` dilindungi dengan `HttpOnly` dan `SameSite`
+- **Candidates module** (`apps/candidates/templates/`):
+  - Form pendaftaran paslon menggunakan `{% csrf_token %}`
+  - Tombol approve/reject di detail page masing-masing dalam `<form method="POST">` dengan CSRF token
+  - Satu paslon tidak bisa mendaftar dua kali — view mengecek `Candidate.objects.filter(user=request.user).exists()`
 
 ---
 
@@ -224,10 +233,14 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
   User.objects.filter(username__iexact=username).exists()
   LoginAttempt.objects.filter(user__username=username, success=False).count()
 
-  # Voters module — semua CRUD menggunakan ORM
+  # Voters module
   Voter.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists()
   Voter.objects.all().order_by("-created_at")
-  voter.delete()
+
+  # Candidates module — semua operasi menggunakan ORM
+  Candidate.objects.filter(user=request.user).exists()
+  Candidate.objects.filter(candidate_number__isnull=False).order_by("-candidate_number")
+  candidate.save()
   ```
 - Input pengguna tidak pernah digabungkan langsung ke string query
 
@@ -274,6 +287,19 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 | 6  | Hapus data pemilih                             | Data terhapus, pesan sukses muncul                          |        |
 | 7  | Akses /voters/ oleh pemilih (non-pengawas)     | Ditolak (403 Forbidden) karena middleware RBAC              |        |
 | 8  | Input dengan karakter berbahaya (XSS attempt)  | Karakter di-escape oleh Django template, tidak dieksekusi   |        |
+
+#### Test Case — Modul 3: Pendaftaran & Verifikasi Paslon
+
+| No | Test Case                                      | Expected Result                                             | Status |
+| -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
+| 1  | Paslon mendaftar dengan data lengkap           | Data tersimpan, redirect ke daftar paslon, status "Menunggu Verifikasi" |  |
+| 2  | Paslon mendaftar dengan visi < 10 karakter     | Muncul error "Visi terlalu pendek (minimal 10 karakter)."  |        |
+| 3  | Paslon mendaftar dua kali                      | Diredirect ke daftar paslon, pesan "Anda sudah terdaftar"  |        |
+| 4  | Pengawas menyetujui paslon                     | Status berubah ke "Disetujui", nomor paslon ditetapkan otomatis |   |
+| 5  | Pengawas menolak paslon                        | Status berubah ke "Ditolak"                                 |        |
+| 6  | Pemilih mencoba akses /candidates/register/    | Ditolak (403 Forbidden) karena middleware RBAC              |        |
+| 7  | Approve/reject tanpa CSRF token                | Request ditolak (403 CSRF verification failed)             |        |
+| 8  | Paslon yang sudah diapprove di-approve lagi    | Pesan "Paslon sudah diverifikasi sebelumnya"               |        |
 
 ---
 

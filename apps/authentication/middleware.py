@@ -11,7 +11,6 @@ class RoleBasedAccessControlMiddleware:
         "/admin/",
         "/static/",
         "/media/",
-        "/voting/results/",
     ]
 
     ROLE_PATHS = {

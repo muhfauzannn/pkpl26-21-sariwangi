@@ -67,7 +67,7 @@ class VoteSuccessView(LoginRequiredMixin, TemplateView):
     template_name = "voting/vote_success.html"
 
 
-class VotingResultsView(TemplateView):
+class VotingResultsView(LoginRequiredMixin, TemplateView):
     template_name = "voting/results.html"
 
     def get_context_data(self, **kwargs):

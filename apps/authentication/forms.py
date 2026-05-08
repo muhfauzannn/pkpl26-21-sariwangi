@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from .models import User
@@ -32,6 +33,7 @@ class RegistrationForm(forms.ModelForm):
         label="Konfirmasi Password",
         widget=forms.PasswordInput(),
     )
+    email = forms.EmailField(required=True)
     role = forms.ChoiceField(
         choices=PUBLIC_ROLES,
         widget=forms.Select(),
@@ -75,11 +77,26 @@ class RegistrationForm(forms.ModelForm):
             raise forms.ValidationError("Email sudah digunakan.")
         return email
 
+    def clean_first_name(self):
+        return self.cleaned_data["first_name"].strip()
+
+    def clean_last_name(self):
+        return self.cleaned_data["last_name"].strip()
+
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Password tidak cocok.")
+        if password2:
+            user = User(
+                username=self.cleaned_data.get("username", ""),
+                email=self.cleaned_data.get("email", ""),
+                first_name=self.cleaned_data.get("first_name", ""),
+                last_name=self.cleaned_data.get("last_name", ""),
+                role=self.cleaned_data.get("role", User.Role.PEMILIH),
+            )
+            validate_password(password2, user=user)
         return password2
 
     def clean(self):

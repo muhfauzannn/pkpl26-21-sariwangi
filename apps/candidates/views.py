@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -20,6 +21,8 @@ class CandidateListView(LoginRequiredMixin, ListView):
         qs = Candidate.objects.all()
         if self.request.user.role == "paslon":
             qs = qs.filter(user=self.request.user)
+        elif self.request.user.role == "pemilih":
+            qs = qs.filter(status=Candidate.Status.APPROVED)
         return qs
 
 
@@ -27,6 +30,14 @@ class CandidateDetailView(LoginRequiredMixin, DetailView):
     model = Candidate
     template_name = "candidates/candidate_detail.html"
     context_object_name = "candidate"
+
+    def get_queryset(self):
+        qs = Candidate.objects.all()
+        if self.request.user.role == "paslon":
+            return qs.filter(user=self.request.user)
+        if self.request.user.role == "pemilih":
+            return qs.filter(status=Candidate.Status.APPROVED)
+        return qs
 
 
 class CandidateRegisterView(LoginRequiredMixin, CreateView):
@@ -37,8 +48,7 @@ class CandidateRegisterView(LoginRequiredMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.role != "paslon":
-            messages.error(request, "Hanya paslon yang bisa mendaftar.")
-            return redirect("candidates:list")
+            raise PermissionDenied("Hanya paslon yang bisa mendaftar.")
         if Candidate.objects.filter(user=request.user).exists():
             messages.warning(request, "Anda sudah terdaftar sebagai paslon.")
             return redirect("candidates:list")
@@ -71,8 +81,7 @@ class CandidateRegisterView(LoginRequiredMixin, CreateView):
 class CandidateApproveView(LoginRequiredMixin, View):
     def post(self, request, pk):
         if request.user.role != "pengawas":
-            messages.error(request, "Hanya pengawas yang bisa memverifikasi.")
-            return redirect("candidates:list")
+            raise PermissionDenied("Hanya pengawas yang bisa memverifikasi.")
 
         candidate = get_object_or_404(Candidate, pk=pk)
         if candidate.status != Candidate.Status.PENDING:
@@ -97,8 +106,7 @@ class CandidateApproveView(LoginRequiredMixin, View):
 class CandidateRejectView(LoginRequiredMixin, View):
     def post(self, request, pk):
         if request.user.role != "pengawas":
-            messages.error(request, "Hanya pengawas yang bisa memverifikasi.")
-            return redirect("candidates:list")
+            raise PermissionDenied("Hanya pengawas yang bisa memverifikasi.")
 
         candidate = get_object_or_404(Candidate, pk=pk)
         if candidate.status != Candidate.Status.PENDING:

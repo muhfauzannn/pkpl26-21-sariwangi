@@ -262,15 +262,34 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 
 ### 1.3 Screenshot Aplikasi
 
-> *Screenshot akan ditambahkan setelah seluruh modul selesai diimplementasi.*
+#### Pemilih
 
-<!-- Placeholder untuk screenshot:
-- Halaman Login
-- Halaman Register
-- Dashboard sesuai role
-- Halaman voting
-- Halaman rekapitulasi
--->
+**Daftar Paslon**
+![Daftar Paslon](screenshots/pemilih_daftar_paslon.png)
+
+**Detail Paslon 1**
+![Detail Paslon 1](screenshots/pemilih_detail_paslon_1.png)
+
+**Detail Paslon 2**
+![Detail Paslon 2](screenshots/pemilih_detail_paslon_2.png)
+
+**Detail Paslon 3**
+![Detail Paslon 3](screenshots/pemilih_detail_paslon_3.png)
+
+**Hasil Suara**
+![Hasil Suara](screenshots/pemilih_hasil_suara.png)
+
+**Voting - Surat Suara**
+![Voting Surat Suara](screenshots/pemilih_voting_surat_suara.png)
+
+**Voting - Pilih Paslon**
+![Voting Pilih Paslon](screenshots/pemilih_voting_pilih_paslon.png)
+
+**Voting - Konfirmasi**
+![Voting Konfirmasi](screenshots/pemilih_voting_konfirmasi.png)
+
+**Voting - Berhasil**
+![Voting Berhasil](screenshots/pemilih_voting_berhasil.png)
 
 ---
 

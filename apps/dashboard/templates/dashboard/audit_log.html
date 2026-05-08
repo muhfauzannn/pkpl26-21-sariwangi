@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Log - E-Voting System{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--spacing-xl);">
+    <div>
+        <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Pengawas Pemilu</p>
+        <h1 class="text-headline">Audit Log</h1>
+    </div>
+    <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">&larr; Dashboard</a>
+</div>
+
+<div class="card">
+    <table style="width:100%; border-collapse:collapse; font-size:16px;">
+        <thead>
+            <tr style="border-bottom:1px solid var(--color-hairline-soft); text-align:left;">
+                <th style="padding:var(--spacing-sm) var(--spacing-md);">Waktu</th>
+                <th style="padding:var(--spacing-sm) var(--spacing-md);">User</th>
+                <th style="padding:var(--spacing-sm) var(--spacing-md);">IP</th>
+                <th style="padding:var(--spacing-sm) var(--spacing-md);">Aksi</th>
+                <th style="padding:var(--spacing-sm) var(--spacing-md);">Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr style="border-bottom:1px solid var(--color-hairline-soft);">
+                <td style="padding:var(--spacing-sm) var(--spacing-md); white-space:nowrap;">{{ log.timestamp|date:"d M Y H:i" }}</td>
+                <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ log.user.username|default:"-" }}</td>
+                <td style="padding:var(--spacing-sm) var(--spacing-md); font-family:var(--font-mono); font-size:14px;">{{ log.ip_address|default:"-" }}</td>
+                <td style="padding:var(--spacing-sm) var(--spacing-md);">
+                    <span style="background:var(--color-surface-soft); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">
+                        {{ log.get_action_display }}
+                    </span>
+                </td>
+                <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ log.description }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding:var(--spacing-lg); text-align:center; color:var(--color-hairline);">
+                    Belum ada aktivitas tercatat.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

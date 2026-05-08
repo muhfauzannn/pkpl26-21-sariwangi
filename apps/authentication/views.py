@@ -4,6 +4,8 @@ from django.urls import reverse
 from django.views import View
 from django.views.generic import FormView
 
+from apps.dashboard.services import log_action
+
 from .forms import LoginForm, RegistrationForm
 from .models import User
 from .services import perform_login, perform_logout
@@ -27,6 +29,7 @@ class LoginView(FormView):
         if error:
             form.add_error(None, error)
             return self.form_invalid(form)
+        log_action(self.request, "login", f"User \"{user.username}\" berhasil login")
         return redirect(self._get_role_url(user.role))
 
     def _get_role_url(self, role):
@@ -40,6 +43,7 @@ class LoginView(FormView):
 
 class LogoutView(View):
     def post(self, request):
+        log_action(request, "logout", f"User \"{request.user.username}\" logout")
         perform_logout(request)
         return redirect(reverse("authentication:login"))
 

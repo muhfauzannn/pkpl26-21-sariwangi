@@ -249,8 +249,13 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
   Vote.objects.filter(voter=request.user).exists()
   Vote.objects.create(voter=user, candidate=candidate)
   Vote.objects.count()
+
+  # Dashboard module — audit logging
+  AuditLog.objects.create(user=request.user, action=action, description=desc, ip_address=ip)
+  AuditLog.objects.all()[:100]
   ```
 - Input pengguna tidak pernah digabungkan langsung ke string query
+- **Audit logging** (`apps/dashboard/services.py`): Setiap aksi penting (login, logout, vote, CRUD pemilih, approve/reject paslon) dicatat ke model `AuditLog` dengan user, action, description, IP address, dan timestamp
 
 ---
 
@@ -320,6 +325,18 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 | 5  | Vote tanpa memilih paslon                      | Muncul error "Pilih salah satu paslon."                    |        |
 | 6  | Hasil voting menampilkan jumlah suara per paslon | Vote count ditampilkan dengan progress bar                |        |
 | 7  | IntegrityError saat double vote (race condition) | Ditangkap oleh try/except, pesan error ditampilkan        |        |
+
+#### Test Case — Modul 5: Rekapitulasi & Audit
+
+| No | Test Case                                      | Expected Result                                             | Status |
+| -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
+| 1  | Dashboard menampilkan total suara dan rekapitulasi | Angka benar, progress bar sesuai proporsi                |        |
+| 2  | Audit log mencatat login                       | Tercatat dengan username, IP, dan timestamp                |        |
+| 3  | Audit log mencatat logout                      | Tercatat dengan username dan timestamp                     |        |
+| 4  | Audit log mencatat voter create/update/delete  | Tercatat dengan nama pemilih dan NIK                       |        |
+| 5  | Audit log mencatat candidate approve/reject    | Tercatat dengan nama paslon dan nomor paslon               |        |
+| 6  | Audit log mencatat vote                        | Tercatat dengan username dan nama paslon yang dipilih      |        |
+| 7  | Halaman audit log menampilkan 100 log terbaru  | Tabel berisi waktu, user, IP, aksi, dan detail             |        |
 
 ---
 

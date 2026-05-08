@@ -1,11 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}Voting - E-Voting System{% endblock %}
-{% block page_title %}Pemungutan Suara{% endblock %}
+{% block title %}Surat Suara - E-Voting System{% endblock %}
+{% block page_title %}Surat Suara Digital{% endblock %}
 {% block nav_vote %}active{% endblock %}
 
 {% block content %}
-<div style="max-width:640px;">
+<div style="max-width:900px;">
+    <!-- Progress Stepper -->
+    <div class="stepper" style="margin-bottom:var(--spacing-xl);">
+        <div class="stepper__line"></div>
+        <div class="stepper__step stepper__step--done">
+            <div class="stepper__circle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <span class="stepper__label">Identitas</span>
+        </div>
+        <div class="stepper__step stepper__step--active">
+            <div class="stepper__circle">2</div>
+            <span class="stepper__label">Surat Suara</span>
+        </div>
+        <div class="stepper__step">
+            <div class="stepper__circle">3</div>
+            <span class="stepper__label">Konfirmasi</span>
+        </div>
+        <div class="stepper__step">
+            <div class="stepper__circle">4</div>
+            <span class="stepper__label">Selesai</span>
+        </div>
+    </div>
+
+    <p class="text-body-sm" style="color:#888; margin-bottom:var(--spacing-xl);">
+        Pilih salah satu pasangan calon untuk melanjutkan ke tahap konfirmasi.
+    </p>
+
     {% if form.non_field_errors or form.candidate.errors %}
         <div class="alert alert-error" style="margin-bottom:var(--spacing-lg);">
             {% for error in form.candidate.errors %}{{ error }}{% endfor %}
@@ -17,36 +44,147 @@
     <form method="post" id="vote-form">
         {% csrf_token %}
 
-        {% for candidate in candidates %}
-        <div class="card" style="margin-bottom:var(--spacing-md); display:flex; align-items:flex-start; gap:var(--spacing-md);">
-            <input type="radio" name="candidate" value="{{ candidate.pk }}" id="candidate-{{ candidate.pk }}"
-                   style="margin-top:var(--spacing-sm); width:20px; height:20px; accent-color:var(--color-primary);"
-                   {% if form.candidate.value|stringformat:"s" == candidate.pk|stringformat:"s" %}checked{% endif %}>
-            <label for="candidate-{{ candidate.pk }}" style="flex:1; cursor:pointer;">
-                <div style="display:flex; align-items:center; gap:var(--spacing-sm); margin-bottom:var(--spacing-xs);">
-                    <span class="text-caption">No. {{ candidate.candidate_number }}</span>
-                    <span class="text-body-lg" style="font-weight:540;">{{ candidate.name }}</span>
+        <!-- Ballot Grid -->
+        <div class="ballot-grid">
+            {% for candidate in candidates %}
+            <div class="ballot-card" id="ballot-{{ candidate.pk }}" onclick="selectCandidate({{ candidate.pk }})">
+                <!-- Header -->
+                <div class="ballot-card__header">
+                    <div style="display:flex; align-items:center; gap:var(--spacing-sm);">
+                        <div class="ballot-card__number">{{ candidate.candidate_number }}</div>
+                        <span class="text-body-lg" style="font-weight:540;">{{ candidate.name }}</span>
+                    </div>
+                    <div class="ballot-card__check" id="check-{{ candidate.pk }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </div>
                 </div>
-                <p class="text-body-sm" style="margin-bottom:var(--spacing-xs);">
-                    <strong>Visi:</strong> {{ candidate.visi|truncatechars:120 }}
-                </p>
-                <p class="text-body-sm">
-                    <strong>Misi:</strong> {{ candidate.misi|truncatechars:120 }}
-                </p>
-            </label>
+
+                <!-- Body -->
+                <div class="ballot-card__body">
+                    {% if candidate.photo %}
+                    <div class="ballot-card__photo">
+                        <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}">
+                    </div>
+                    {% endif %}
+                    <div class="ballot-card__info">
+                        {% if candidate.members.exists %}
+                        <div style="margin-bottom:var(--spacing-sm);">
+                            {% for member in candidate.members.all %}
+                            <span class="text-body-sm">{{ member.name }}{% if not forloop.last %} &amp; {% endif %}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="ballot-card__visi">
+                            <strong class="text-body-sm">Visi:</strong>
+                            <p class="text-body-sm" style="color:#666;">{{ candidate.visi|truncatechars:140 }}</p>
+                        </div>
+                        <a href="{% url 'candidates:detail' candidate.pk %}" class="ballot-card__link" onclick="event.stopPropagation()">Lihat Visi-Misi Lengkap</a>
+                    </div>
+                </div>
+
+                <!-- Hidden radio -->
+                <input type="radio" name="candidate" value="{{ candidate.pk }}" id="candidate-{{ candidate.pk }}"
+                       style="display:none;"
+                       {% if form.candidate.value|stringformat:"s" == candidate.pk|stringformat:"s" %}checked{% endif %}>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="grid-column:1/-1;">
+                <div class="empty-state__icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                </div>
+                <p class="empty-state__text">Belum ada paslon yang disetujui.</p>
+            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="empty-state">
-            <div class="empty-state__icon">&#128203;</div>
-            <p class="empty-state__text">Belum ada paslon yang disetujui.</p>
-        </div>
-        {% endfor %}
 
         {% if candidates %}
-        <button type="submit" class="btn btn-primary" style="margin-top:var(--spacing-lg);">
-            Submit Voting
-        </button>
+        <!-- Action Bar -->
+        <div style="display:flex; justify-content:flex-end; margin-top:var(--spacing-xl); padding-top:var(--spacing-lg); border-top:1px solid var(--color-hairline);">
+            <button type="button" class="btn btn-primary btn-sm" id="review-btn" onclick="openConfirmModal()" disabled>Pilih Paslon</button>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div class="modal-overlay" id="confirm-modal" onclick="if(event.target===this)closeConfirmModal()">
+            <div class="modal">
+                <div class="modal__header">
+                    <div style="display:flex; align-items:center; gap:var(--spacing-sm);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <div>
+                            <h3 class="text-body-lg" style="font-weight:540;">Konfirmasi Pilihan</h3>
+                            <p class="text-body-sm" style="color:#888;">Periksa kembali pilihan Anda sebelum mengirim.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal__body">
+                    <div class="card" style="display:flex; align-items:center; gap:var(--spacing-md); margin-bottom:var(--spacing-md);">
+                        <div class="ballot-card__number" id="modal-number" style="font-size:14px; width:36px; height:36px;">--</div>
+                        <div>
+                            <div class="text-body" style="font-weight:480;" id="modal-name">-</div>
+                            <div class="text-body-sm" style="color:#888;" id="modal-members">-</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:var(--spacing-xs); padding:var(--spacing-sm) var(--spacing-md); background:var(--color-surface-soft); border-radius:var(--rounded-sm); font-size:13px; color:#888;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Suara Anda bersifat rahasia dan tidak dapat diubah setelah dikirim.
+                    </div>
+                </div>
+                <div class="modal__footer">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeConfirmModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Kirim Suara</button>
+                </div>
+            </div>
+        </div>
         {% endif %}
     </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var selectedId = null;
+
+function selectCandidate(pk) {
+    // Deselect all
+    document.querySelectorAll('.ballot-card').forEach(function(el) {
+        el.classList.remove('ballot-card--selected');
+    });
+    document.querySelectorAll('.ballot-card__check').forEach(function(el) {
+        el.style.display = 'none';
+    });
+
+    // Select this one
+    var card = document.getElementById('ballot-' + pk);
+    card.classList.add('ballot-card--selected');
+    document.getElementById('check-' + pk).style.display = 'flex';
+    document.getElementById('candidate-' + pk).checked = true;
+    document.getElementById('review-btn').disabled = false;
+
+    // Store selection data for modal
+    selectedId = pk;
+    var nameEl = card.querySelector('.text-body-lg');
+    var membersEl = card.querySelector('.ballot-card__info > div:first-child');
+    var numberEl = card.querySelector('.ballot-card__number');
+
+    document.getElementById('modal-name').textContent = nameEl ? nameEl.textContent : '';
+    document.getElementById('modal-members').textContent = membersEl ? membersEl.textContent : '';
+    document.getElementById('modal-number').textContent = numberEl ? numberEl.textContent : '--';
+}
+
+function openConfirmModal() {
+    if (!selectedId) return;
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+
+// Check if a radio is already checked on load
+document.addEventListener('DOMContentLoaded', function() {
+    var checked = document.querySelector('input[name="candidate"]:checked');
+    if (checked) {
+        selectCandidate(checked.value);
+    }
+});
+</script>
 {% endblock %}

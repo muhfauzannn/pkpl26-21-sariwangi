@@ -5,16 +5,58 @@
 {% block nav_vote %}active{% endblock %}
 
 {% block content %}
-<div style="max-width:480px; margin:0 auto; padding-top:var(--spacing-xl);">
-    <div class="card card-elevated text-center" style="padding:var(--spacing-xxl);">
-        <div class="color-block color-block-mint" style="padding:var(--spacing-lg); margin-bottom:var(--spacing-lg); border-radius:var(--rounded-full); display:inline-flex; width:64px; height:64px; align-items:center; justify-content:center;">
-            <span style="font-size:28px; color:var(--color-success);">&#10003;</span>
+<div style="max-width:520px; margin:0 auto; padding-top:var(--spacing-xl);">
+    <!-- Stepper -->
+    <div class="stepper" style="margin-bottom:var(--spacing-xl);">
+        <div class="stepper__line"></div>
+        <div class="stepper__step stepper__step--done">
+            <div class="stepper__circle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <span class="stepper__label">Identitas</span>
         </div>
-        <h1 class="text-headline" style="margin-bottom:var(--spacing-md);">Voting Berhasil</h1>
-        <p class="text-body" style="margin-bottom:var(--spacing-xl);">
-            Suara Anda telah berhasil dicatat. Terima kasih telah berpartisipasi dalam pemungutan suara.
+        <div class="stepper__step stepper__step--done">
+            <div class="stepper__circle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <span class="stepper__label">Surat Suara</span>
+        </div>
+        <div class="stepper__step stepper__step--done">
+            <div class="stepper__circle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <span class="stepper__label">Konfirmasi</span>
+        </div>
+        <div class="stepper__step stepper__step--done">
+            <div class="stepper__circle stepper__circle--success">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <span class="stepper__label">Selesai</span>
+        </div>
+    </div>
+
+    <!-- Success Card -->
+    <div class="card card-elevated text-center" style="padding:var(--spacing-xxl);">
+        <div style="width:72px; height:72px; background:var(--color-block-mint); border-radius:var(--rounded-full); display:inline-flex; align-items:center; justify-content:center; margin-bottom:var(--spacing-lg);">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+        </div>
+        <h2 class="text-headline" style="margin-bottom:var(--spacing-sm);">Suara Anda Telah Tercatat</h2>
+        <p class="text-body" style="color:#888; margin-bottom:var(--spacing-xl);">
+            Terima kasih atas partisipasi Anda. Suara telah diverifikasi dan disimpan secara aman.
         </p>
-        <a href="{% url 'voting:results' %}" class="btn btn-primary">Lihat Hasil Sementara</a>
+
+        <!-- Receipt -->
+        <div class="card" style="text-align:left; display:flex; align-items:center; gap:var(--spacing-md); margin-bottom:var(--spacing-xl);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <div>
+                <p class="text-caption" style="margin-bottom:var(--spacing-xxs);">Waktu Pencatatan</p>
+                <p class="text-body-sm">{% now "d M Y, H:i:s" %} UTC</p>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:var(--spacing-sm); justify-content:center;">
+            <a href="{% url 'voting:results' %}" class="btn btn-primary btn-sm">Lihat Hasil Sementara</a>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -15,6 +15,13 @@ class VoterListView(LoginRequiredMixin, ListView):
     context_object_name = "voters"
     ordering = ["-created_at"]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_voters"] = Voter.objects.count()
+        context["voted_count"] = Voter.objects.filter(has_voted=True).count()
+        context["active_count"] = Voter.objects.filter(status=Voter.Status.ACTIVE).count()
+        return context
+
 
 class VoterCreateView(LoginRequiredMixin, CreateView):
     model = Voter

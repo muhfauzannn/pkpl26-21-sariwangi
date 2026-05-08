@@ -1,32 +1,48 @@
 {% extends "base.html" %}
 
 {% block title %}Hasil Voting - E-Voting System{% endblock %}
-{% block page_title %}Hasil Voting{% endblock %}
+{% block page_title %}Rekapitulasi Hasil{% endblock %}
 {% block nav_results %}active{% endblock %}
 
 {% block content %}
-<div style="max-width:640px;">
-    <p class="text-body-sm" style="margin-bottom:var(--spacing-xl); color:#888;">
-        Total suara masuk: <strong>{{ total_votes }}</strong>
-    </p>
+<div style="max-width:700px;">
+    <!-- Stats bar -->
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin-bottom:var(--spacing-xl);">
+        <div class="stat-card">
+            <p class="stat-card__value">{{ total_votes }}</p>
+            <p class="stat-card__label">Total Suara Masuk</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-card__value">{{ results|length }}</p>
+            <p class="stat-card__label">Paslon</p>
+        </div>
+    </div>
 
     {% for item in results %}
     <div class="card" style="margin-bottom:var(--spacing-md);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--spacing-sm);">
-            <div>
-                <span class="text-caption">No. {{ item.candidate.candidate_number }}</span>
-                <span class="text-body-lg" style="font-weight:540; margin-left:var(--spacing-xs);">{{ item.candidate.name }}</span>
+            <div style="display:flex; align-items:center; gap:var(--spacing-sm);">
+                <div class="ballot-card__number" style="font-size:14px; width:32px; height:32px;">{{ item.candidate.candidate_number }}</div>
+                <span class="text-body-lg" style="font-weight:540;">{{ item.candidate.name }}</span>
             </div>
-            <span class="text-headline" style="color:var(--color-primary);">{{ item.vote_count }}</span>
+            <div style="text-align:right;">
+                <span class="text-headline" style="color:var(--color-primary);">{{ item.vote_count }}</span>
+                <span class="text-body-sm" style="color:#888;"> suara</span>
+            </div>
         </div>
         <div class="progress-bar">
             {% widthratio item.vote_count total_votes 100 as percent %}
             <div class="progress-bar__fill" style="width:{% if total_votes > 0 %}{{ percent }}{% else %}0{% endif %}%;"></div>
         </div>
+        {% if total_votes > 0 %}
+        <p class="text-caption" style="margin-top:var(--spacing-xs); color:#888;">{{ percent }}%</p>
+        {% endif %}
     </div>
     {% empty %}
     <div class="empty-state">
-        <div class="empty-state__icon">&#128203;</div>
+        <div class="empty-state__icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        </div>
         <p class="empty-state__text">Belum ada hasil voting.</p>
     </div>
     {% endfor %}

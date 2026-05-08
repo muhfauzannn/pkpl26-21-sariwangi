@@ -1,16 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}Daftar Pemilih - E-Voting System{% endblock %}
-{% block page_title %}Data Pemilih{% endblock %}
+{% block title %}Data Pemilih - E-Voting System{% endblock %}
+{% block page_title %}Manajemen Data Pemilih{% endblock %}
 {% block nav_voters %}active{% endblock %}
 
 {% block content %}
+<p class="text-body-sm" style="color:#888; margin-bottom:var(--spacing-xl);">
+    Kelola data pemilih terdaftar. Validasi NIK, NPM, dan status kepegawaian.
+</p>
+
+<!-- KPI Row -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:var(--spacing-xl);">
+    <div class="stat-card">
+        <div class="stat-card__value">{{ total_voters }}</div>
+        <div class="stat-card__label">Total Pemilih</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__value">{{ voted_count }}</div>
+        <div class="stat-card__label">Sudah Memilih</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__value">{{ active_count }}</div>
+        <div class="stat-card__label">Status Aktif</div>
+    </div>
+</div>
+
+<!-- Actions -->
 <div class="page-header">
     <div></div>
     <a href="{% url 'voters:create' %}" class="btn btn-primary btn-sm">Tambah Pemilih</a>
 </div>
 
-<div class="card">
+<!-- Table -->
+<div class="card" style="padding:0; overflow:hidden;">
     <div class="table-wrapper" style="border:none;">
         <table class="table">
             <thead>
@@ -27,7 +49,7 @@
             <tbody>
                 {% for voter in voters %}
                 <tr>
-                    <td>{{ voter.full_name }}</td>
+                    <td style="font-weight:480;">{{ voter.full_name }}</td>
                     <td style="font-family:var(--font-mono); font-size:13px;">{{ voter.nik }}</td>
                     <td style="font-family:var(--font-mono); font-size:13px;">{{ voter.npm }}</td>
                     <td>{{ voter.faculty }}</td>
@@ -40,9 +62,9 @@
                     </td>
                     <td>
                         {% if voter.has_voted %}
-                            <span style="color:var(--color-success);">&#10003;</span>
+                            <span style="color:var(--color-success); font-size:16px;">&#10003;</span>
                         {% else %}
-                            <span style="color:#ccc;">&#10005;</span>
+                            <span style="color:#ccc; font-size:16px;">&#10005;</span>
                         {% endif %}
                     </td>
                     <td style="white-space:nowrap;">
@@ -53,6 +75,9 @@
                 {% empty %}
                 <tr>
                     <td colspan="7" class="empty-state">
+                        <div class="empty-state__icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </div>
                         <p class="empty-state__text">Belum ada data pemilih.</p>
                     </td>
                 </tr>

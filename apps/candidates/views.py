@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView
 
+from apps.dashboard.services import log_action
+
 from .forms import CandidateMemberFormSet, CandidateRegistrationForm
 from .models import Candidate
 
@@ -61,6 +63,7 @@ class CandidateRegisterView(LoginRequiredMixin, CreateView):
             member_formset.instance = self.object
             member_formset.save()
             messages.success(self.request, "Pendaftaran paslon berhasil dikirim. Menunggu verifikasi pengawas.")
+            log_action(self.request, "candidate_register", f"Paslon \"{self.object.name}\" mendaftar")
             return redirect(self.success_url)
         return self.form_invalid(form)
 
@@ -87,6 +90,7 @@ class CandidateApproveView(LoginRequiredMixin, View):
         candidate.verified_by = request.user
         candidate.save()
         messages.success(request, f"Paslon \"{candidate.name}\" berhasil disetujui (No. {candidate.candidate_number}).")
+        log_action(request, "candidate_approve", f"Menyetujui paslon \"{candidate.name}\" (No. {candidate.candidate_number})")
         return redirect("candidates:detail", pk=pk)
 
 
@@ -105,4 +109,5 @@ class CandidateRejectView(LoginRequiredMixin, View):
         candidate.verified_by = request.user
         candidate.save()
         messages.success(request, f"Paslon \"{candidate.name}\" ditolak.")
+        log_action(request, "candidate_reject", f"Menolak paslon \"{candidate.name}\"")
         return redirect("candidates:detail", pk=pk)

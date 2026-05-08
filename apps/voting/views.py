@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.views.generic import FormView, TemplateView
 
 from apps.candidates.models import Candidate
+from apps.dashboard.services import log_action
 
 from .forms import VoteForm
 from .models import Vote
@@ -37,6 +38,7 @@ class VotingView(LoginRequiredMixin, FormView):
                 candidate=form.cleaned_data["candidate"],
             )
             messages.success(self.request, "Voting berhasil dicatat.")
+            log_action(self.request, "vote", f"User \"{self.request.user.username}\" memilih paslon \"{form.cleaned_data['candidate'].name}\"")
             return redirect("voting:success")
         except IntegrityError:
             messages.error(self.request, "Anda sudah melakukan voting sebelumnya.")

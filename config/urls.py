@@ -10,6 +10,7 @@ urlpatterns = [
     path("voters/", include("apps.voters.urls")),
     path("candidates/", include("apps.candidates.urls")),
     path("voting/", include("apps.voting.urls")),
+    path("dashboard/", include("apps.dashboard.urls")),
 ]
 
 if settings.DEBUG:

@@ -11,12 +11,13 @@ class RoleBasedAccessControlMiddleware:
         "/admin/",
         "/static/",
         "/media/",
+        "/voting/results/",
     ]
 
     ROLE_PATHS = {
         "pengawas": ["/"],
-        "pemilih": ["/voting/", "/auth/logout/"],
-        "paslon": ["/candidates/", "/voting/results/", "/auth/logout/"],
+        "pemilih": ["/voting/", "/dashboard/audit-log/", "/auth/logout/"],
+        "paslon": ["/candidates/", "/voting/results/", "/dashboard/audit-log/", "/auth/logout/"],
     }
 
     def __init__(self, get_response):

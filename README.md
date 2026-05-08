@@ -557,11 +557,7 @@ PKPL26_21_sariwangi/
 
 ## 3. Video Demo & Penjelasan
 
-> *Link video akan ditambahkan setelah video selesai direkam.*
-
-<!-- TODO: Upload video ke YouTube sebagai "Unlisted" dan taruh link di sini -->
-
-**Video URL:** `https://youtu.be/XXXXXXX`
+**Video URL:** `https://youtu.be/a9cHudECDqE`
 
 **Konten Video:**
 1. Demo aplikasi secara fungsional (maks. 2 menit)

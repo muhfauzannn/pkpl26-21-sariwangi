@@ -354,7 +354,17 @@ Bagian securtiy lainnya akan kami demokan divideo.
 ![Audit Log](screenshots/pengawas_audit_log.png)
 
 #### Paslon
+##### Registrasi Paslon
+![Registrasi Paslon](screenshots/Registrasi_Paslon_-_E-Voting_System.png)
 
+##### Daftar Paslon - Menunggu Verifikasi
+![Daftar Paslon Menunggu](screenshots/Daftar_Paslon_Menunggu_-_E-Voting_System.png)
+
+##### Daftar Paslon - Disetujui
+![Daftar Paslon Disetujui](screenshots/Daftar_Paslon_Disetujui_-_E-Voting_System.png)
+
+##### Rekapitulasi Hasil Suara
+![Rekapitulasi Hasil](screenshots/Rekapitulasi_Hasil_-_E-Voting_System.png)
 ---
 
 ### 1.4 Hasil Test-Case

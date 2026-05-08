@@ -329,6 +329,50 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 **Audit Log**
 ![Audit Log](screenshots/pengawas_audit_log.png)
 
+#### Pemilih
+
+**Login**
+![Login](screenshots/Login - E-Voting System.png)
+
+**Registrasi**
+![Registrasi](screenshots/Registrasi - E-Voting System.png)
+
+**Daftar Paslon**
+![Daftar Paslon](screenshots/Daftar Paslon - E-Voting System.png)
+
+**Detail Paslon 1**
+![Detail Paslon 1](screenshots/Paslon Harapan Bangsa - E-Voting System.png)
+
+**Detail Paslon 2**
+![Detail Paslon 2](screenshots/Paslon Maju Bersama - E-Voting System.png)
+
+**Detail Paslon 3**
+![Detail Paslon 3](screenshots/Paslon Untuk Rakyat - E-Voting System.png)
+
+**Voting - Pilih Paslon 1**
+![Voting Pilih Paslon 1](screenshots/Surat Suara - E-Voting System (pilih 1).png)
+
+**Voting - Pilih Paslon 2**
+![Voting Pilih Paslon 2](screenshots/Surat Suara - E-Voting System (pilih 2).png)
+
+**Voting - Pilih Paslon 3**
+![Voting Pilih Paslon 3](screenshots/Surat Suara - E-Voting System (pilih 3).png)
+
+**Voting - Konfirmasi Pilihan**
+![Voting Konfirmasi](screenshots/Surat suara - E-Voting System (pilih paslon).png)
+
+**Voting Berhasil**
+![Voting Berhasil](screenshots/Voting Berhasil - E-Voting System.png)
+
+**Hasil Voting**
+![Hasil Voting](screenshots/Hasil Voting - E-Voting System (lihat hasil).png)
+
+**Login Salah > 5x Akun Locked**
+![Login Locked](screenshots/Login Salah > 5x Akun Locked.png)
+
+**Password Ter-hash di Database**
+![Password Hash Database](screenshots/Password ter-hash di Database.png)
+
 ---
 
 ### 1.4 Hasil Test-Case

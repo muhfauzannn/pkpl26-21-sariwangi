@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Voting Berhasil - E-Voting System{% endblock %}
+
+{% block content %}
+<div style="max-width:480px; margin:0 auto; padding-top:var(--spacing-section);">
+    <div class="card card-elevated text-center" style="padding:var(--spacing-xxl);">
+        <div class="color-block color-block-mint" style="padding:var(--spacing-lg); margin-bottom:var(--spacing-lg); border-radius:var(--rounded-full); display:inline-flex; width:64px; height:64px; align-items:center; justify-content:center;">
+            <span style="font-size:28px; color:var(--color-success);">&#10003;</span>
+        </div>
+        <h1 class="text-headline" style="margin-bottom:var(--spacing-md);">Voting Berhasil</h1>
+        <p class="text-body" style="margin-bottom:var(--spacing-xl);">
+            Suara Anda telah berhasil dicatat. Terima kasih telah berpartisipasi dalam pemungutan suara.
+        </p>
+        <a href="{% url 'voting:results' %}" class="btn btn-primary">Lihat Hasil Sementara</a>
+    </div>
+</div>
+{% endblock %}

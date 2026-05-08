@@ -9,6 +9,7 @@ urlpatterns = [
     path("auth/", include("apps.authentication.urls")),
     path("voters/", include("apps.voters.urls")),
     path("candidates/", include("apps.candidates.urls")),
+    path("voting/", include("apps.voting.urls")),
 ]
 
 if settings.DEBUG:

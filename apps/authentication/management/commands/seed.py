@@ -9,6 +9,9 @@ from apps.voters.models import Voter
 from apps.voting.models import Vote
 
 
+DEMO_PASSWORD = "SariwangiDemo123!"
+
+
 class Command(BaseCommand):
     help = "Seed database with sample data"
 
@@ -50,12 +53,12 @@ class Command(BaseCommand):
             User.objects.create_user(
                 username="pengawas",
                 email="pengawas@evote.id",
-                password="password123",
+                password=DEMO_PASSWORD,
                 first_name="Pengawas",
                 last_name="Pemilu",
                 role="pengawas",
             )
-            self.stdout.write(self.style.SUCCESS("Created pengawas (password123)"))
+            self.stdout.write(self.style.SUCCESS(f"Created pengawas ({DEMO_PASSWORD})"))
         else:
             self.stdout.write("pengawas already exists, skipping.")
 
@@ -97,7 +100,7 @@ class Command(BaseCommand):
                 paslon_user = User.objects.create_user(
                     username=f"paslon{i+1}",
                     email=f"paslon{i+1}@evote.id",
-                    password="password123",
+                    password=DEMO_PASSWORD,
                     first_name=f"Paslon",
                     last_name=f"{i+1}",
                     role="paslon",
@@ -151,7 +154,7 @@ class Command(BaseCommand):
             user = User.objects.create_user(
                 username=username,
                 email=f"{username}@evote.id",
-                password="password123",
+                password=DEMO_PASSWORD,
                 first_name=fname,
                 last_name=lname,
                 role="pemilih",

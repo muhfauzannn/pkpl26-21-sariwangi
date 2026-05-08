@@ -1,16 +1,21 @@
-from django.test import TestCase
+import importlib
+
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from apps.authentication.models import User
 from apps.candidates.models import Candidate
 from apps.voters.models import Voter
 from apps.voting.models import Vote
+from config.urls import home_redirect
 
 from .models import AuditLog
+from .services import log_action
 
 
 class DashboardAuditTests(TestCase):
     def setUp(self):
+        self.factory = RequestFactory()
         self.pengawas = User.objects.create_user(
             username="pengawas",
             password="StrongPass123!",
@@ -37,6 +42,42 @@ class DashboardAuditTests(TestCase):
         self.assertTrue(
             AuditLog.objects.filter(user=self.pengawas, action=AuditLog.Action.LOGOUT).exists()
         )
+
+    def test_log_action_uses_forwarded_ip_and_allows_anonymous_user(self):
+        request = self.factory.get("/", HTTP_X_FORWARDED_FOR="203.0.113.20, 10.0.0.1")
+        request.user = type(
+            "Anonymous",
+            (),
+            {"is_authenticated": False},
+        )()
+
+        log_action(request, AuditLog.Action.LOGIN, "Anonymous action")
+
+        log = AuditLog.objects.get(description="Anonymous action")
+        self.assertIsNone(log.user)
+        self.assertEqual(log.ip_address, "203.0.113.20")
+
+    def test_home_redirect_uses_role_destinations_and_default(self):
+        import config.urls
+
+        importlib.reload(config.urls)
+
+        for role, expected_url in (
+            (User.Role.PENGAWAS, "/dashboard/"),
+            (User.Role.PASLON, "/candidates/"),
+            (User.Role.PEMILIH, "/voting/"),
+            ("unknown", "/dashboard/"),
+        ):
+            request = self.factory.get("/")
+            request.user = type(
+                "RequestUser",
+                (),
+                {"role": role, "is_authenticated": True},
+            )()
+
+            response = home_redirect(request)
+
+            self.assertEqual(response["Location"], expected_url)
 
     def test_audit_log_view_returns_latest_100_entries(self):
         for index in range(101):

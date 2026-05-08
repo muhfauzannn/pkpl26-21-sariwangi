@@ -281,6 +281,8 @@ Pengujian dilakukan dengan Django test client dan system check pada settings dev
 ```bash
 source .venv/bin/activate
 python manage.py test --settings=config.settings.development
+coverage run manage.py test --settings=config.settings.development
+coverage report -m
 python manage.py check --settings=config.settings.development
 SECRET_KEY=check-secret ALLOWED_HOSTS=localhost,127.0.0.1 python manage.py check --settings=config.settings.production
 ```
@@ -288,9 +290,10 @@ SECRET_KEY=check-secret ALLOWED_HOSTS=localhost,127.0.0.1 python manage.py check
 Log hasil pengujian:
 
 ```text
-Found 26 test(s).
-Ran 26 tests in 7.335s
+Found 46 test(s).
+Ran 46 tests in 13.232s
 OK
+TOTAL 707 0 100%
 System check identified no issues (0 silenced).
 System check identified no issues (0 silenced).
 ```
@@ -414,9 +417,9 @@ Data yang dibuat oleh seeder:
 
 | Data | Detail |
 | --- | --- |
-| **Pengawas** | `pengawas` / `password123` |
-| **3 Paslon** | `paslon1`, `paslon2`, `paslon3` / `password123` — status approved, dengan anggota |
-| **25 Pemilih** | `pemilih1`–`pemilih25` / `password123` — terhubung ke Voter profile, 75% sudah vote |
+| **Pengawas** | `pengawas` / `SariwangiDemo123!` |
+| **3 Paslon** | `paslon1`, `paslon2`, `paslon3` / `SariwangiDemo123!` — status approved, dengan anggota |
+| **25 Pemilih** | `pemilih1`–`pemilih25` / `SariwangiDemo123!` — terhubung ke Voter profile, 75% sudah vote |
 
 Password di atas hanya kredensial demo lokal yang dibuat oleh seeder. Password tetap disimpan sebagai hash PBKDF2 di database.
 

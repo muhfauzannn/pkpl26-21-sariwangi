@@ -23,7 +23,10 @@ class LoginAttempt(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name="login_attempts",
+        null=True,
+        blank=True,
     )
+    username = models.CharField(max_length=150, db_index=True)
     ip_address = models.GenericIPAddressField()
     timestamp = models.DateTimeField(auto_now_add=True)
     success = models.BooleanField(default=False)

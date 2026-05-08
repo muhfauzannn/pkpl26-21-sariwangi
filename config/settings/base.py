@@ -81,14 +81,6 @@ DATABASES = {
     }
 }
 
-import dj_database_url
-
-_db_url = os.environ.get("DATABASE_URL")
-if _db_url:
-    DATABASES["default"] = dj_database_url.parse(
-        _db_url, conn_max_age=600, conn_health_checks=True
-    )
-
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -127,6 +119,8 @@ SESSION_COOKIE_AGE = 1800
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = "Lax"
 
 # Authentication
 LOGIN_URL = "/auth/login/"

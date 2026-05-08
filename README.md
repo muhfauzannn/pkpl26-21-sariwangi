@@ -76,7 +76,7 @@ class LoginForm(forms.Form):
 - **Authentication module** (`apps/authentication/forms.py`):
   - Username: divalidasi dengan `UnicodeUsernameValidator`, dicek uniqueness (case-insensitive), di-strip whitespace
   - Email: divalidasi format email (`EmailField`), dicek uniqueness (case-insensitive)
-  - Password: konfirmasi password wajib cocok, divalidasi melalui Django password validators
+  - Password: konfirmasi password wajib cocok dan divalidasi melalui Django password validators
   - Role: dibatasi hanya pilihan yang valid (allowlist, bukan free text)
 - **Voters module** (`apps/voters/forms.py`):
   - NIK: validasi regex 16 digit angka (`^\d{16}$`)
@@ -128,7 +128,7 @@ def is_account_locked(username, ip_address):
 **Teknik Mitigasi:**
 
 1. **Password Hashing (PBKDF2):**
-   - Menggunakan PBKDF2 dengan salt (200,000+ iterations)
+   - Menggunakan PBKDF2 dengan salt melalui password hasher bawaan Django
    - Konfigurasi eksplisit di `config/settings/base.py`:
    ```python
    PASSWORD_HASHERS = [
@@ -157,9 +157,9 @@ def is_account_locked(username, ip_address):
 4. **Least Privilege:**
    - Registrasi hanya memperbolehkan role `pemilih` dan `paslon` — `pengawas` harus dibuat via Django admin
    - Role-Based Access Control Middleware membatasi akses berdasarkan role:
-     - `pengawas`: semua path
-     - `pemilih`: `/voting/`, `/auth/logout/`
-     - `paslon`: `/candidates/`, `/auth/logout/`
+     - `pengawas`: semua path aplikasi dan dashboard audit
+     - `pemilih`: `/voting/`, `/candidates/` hanya paslon approved/read-only, `/auth/logout/`
+     - `paslon`: `/candidates/` untuk data paslonnya sendiri, `/voting/results/`, `/auth/logout/`
    - User yang mengakses path di luar haknya mendapat `403 Forbidden`
 
 ---
@@ -193,7 +193,7 @@ def is_account_locked(username, ip_address):
 - Semua form yang melakukan operasi write (POST/PUT/DELETE) menggunakan `{% csrf_token %}`
 - CSRF token divalidasi di sisi server sebelum memproses request
 - Logout hanya menerima POST request (bukan GET)
-- Cookie `csrfmiddlewaretoken` dilindungi dengan `HttpOnly` dan `SameSite`
+- Cookie CSRF dan session dilindungi dengan `HttpOnly` dan `SameSite=Lax`
 - **Candidates module** (`apps/candidates/templates/`):
   - Form pendaftaran paslon menggunakan `{% csrf_token %}`
   - Tombol approve/reject di detail page masing-masing dalam `<form method="POST">` dengan CSRF token
@@ -255,6 +255,7 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
   AuditLog.objects.all()[:100]
   ```
 - Input pengguna tidak pernah digabungkan langsung ke string query
+- Koneksi database dibatasi ke SQLite lokal (`db.sqlite3`), tanpa dukungan konfigurasi database eksternal
 - **Audit logging** (`apps/dashboard/services.py`): Setiap aksi penting (login, logout, vote, CRUD pemilih, approve/reject paslon) dicatat ke model `AuditLog` dengan user, action, description, IP address, dan timestamp
 
 ---
@@ -275,68 +276,89 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 
 ### 1.4 Hasil Test-Case
 
-> *Hasil test-case lengkap akan ditambahkan setelah seluruh modul selesai diimplementasi.*
+Pengujian dilakukan dengan Django test client dan system check pada settings development serta production.
+
+```bash
+source .venv/bin/activate
+python manage.py test --settings=config.settings.development
+python manage.py check --settings=config.settings.development
+SECRET_KEY=check-secret ALLOWED_HOSTS=localhost,127.0.0.1 python manage.py check --settings=config.settings.production
+```
+
+Log hasil pengujian:
+
+```text
+Found 26 test(s).
+Ran 26 tests in 7.335s
+OK
+System check identified no issues (0 silenced).
+System check identified no issues (0 silenced).
+```
 
 #### Test Case — Modul 1: Authentication & Authorization
 
 | No | Test Case                                      | Expected Result                                             | Status |
 | -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
-| 1  | Login dengan kredensial benar                  | Berhasil login, redirect ke halaman sesuai role             |        |
-| 2  | Login dengan password salah                    | Muncul error "Username atau password salah"                 |        |
-| 3  | Rate limiting (lockout setelah 5x gagal)       | Muncul error "Akun sementara dikunci. Coba lagi dalam 15 menit." |  |
-| 4  | Registrasi dengan role pengawas                | Form tidak memiliki opsi "Pengawas", request ditolak        |        |
-| 5  | Akses halaman protected tanpa login            | Diredirect ke `/auth/login/`                                |        |
-| 6  | CSRF token pada form                           | Form mengandung `csrfmiddlewaretoken`, request tanpa token ditolak (403) | |
+| 1  | Login dengan kredensial benar                  | Berhasil login, redirect ke halaman sesuai role             | PASS |
+| 2  | Login dengan password salah                    | Muncul error "Username atau password salah"                 | PASS |
+| 3  | Rate limiting (lockout setelah 5x gagal)       | Muncul error "Akun sementara dikunci. Coba lagi dalam 15 menit." | PASS |
+| 4  | Registrasi dengan role pengawas                | Form tidak memiliki opsi "Pengawas", request ditolak        | PASS |
+| 5  | Akses halaman protected tanpa login            | Diredirect ke `/auth/login/`                                | PASS |
+| 6  | CSRF token pada form                           | Form mengandung `csrfmiddlewaretoken`, request tanpa token ditolak (403) | PASS |
+| 7  | Password disimpan dengan hashing               | Nilai password tersimpan sebagai hash PBKDF2, bukan plaintext | PASS |
+| 8  | Password lemah saat registrasi                 | Ditolak oleh Django password validators                     | PASS |
 
 #### Test Case — Modul 2: Manajemen Data Pemilih
 
 | No | Test Case                                      | Expected Result                                             | Status |
 | -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
-| 1  | Tambah data pemilih dengan data valid          | Data tersimpan, redirect ke daftar pemilih, muncul pesan sukses |     |
-| 2  | Tambah pemilih dengan NIK kurang dari 16 digit | Muncul error "NIK harus terdiri dari 16 digit angka."       |        |
-| 3  | Tambah pemilih dengan NPM mengandung huruf     | Muncul error "NPM harus terdiri dari digit angka."          |        |
-| 4  | Tambah pemilih dengan email duplikat           | Muncul error "Email sudah digunakan oleh pemilih lain."     |        |
-| 5  | Edit data pemilih                              | Data berhasil diperbarui, pesan sukses muncul               |        |
-| 6  | Hapus data pemilih                             | Data terhapus, pesan sukses muncul                          |        |
-| 7  | Akses /voters/ oleh pemilih (non-pengawas)     | Ditolak (403 Forbidden) karena middleware RBAC              |        |
-| 8  | Input dengan karakter berbahaya (XSS attempt)  | Karakter di-escape oleh Django template, tidak dieksekusi   |        |
+| 1  | Tambah data pemilih dengan data valid          | Data tersimpan, redirect ke daftar pemilih, muncul pesan sukses | PASS |
+| 2  | Tambah pemilih dengan NIK kurang dari 16 digit | Muncul error "NIK harus terdiri dari 16 digit angka."       | PASS |
+| 3  | Tambah pemilih dengan NPM mengandung huruf     | Muncul error "NPM harus terdiri dari digit angka."          | PASS |
+| 4  | Tambah pemilih dengan email duplikat           | Muncul error "Email sudah digunakan oleh pemilih lain."     | PASS |
+| 5  | Edit data pemilih                              | Data berhasil diperbarui, pesan sukses muncul               | PASS |
+| 6  | Hapus data pemilih                             | Data terhapus, pesan sukses muncul                          | PASS |
+| 7  | Akses /voters/ oleh pemilih (non-pengawas)     | Ditolak (403 Forbidden) karena middleware RBAC              | PASS |
+| 8  | Input dengan karakter berbahaya (XSS attempt)  | Karakter di-escape oleh Django template, tidak dieksekusi   | PASS |
 
 #### Test Case — Modul 3: Pendaftaran & Verifikasi Paslon
 
 | No | Test Case                                      | Expected Result                                             | Status |
 | -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
-| 1  | Paslon mendaftar dengan data lengkap           | Data tersimpan, redirect ke daftar paslon, status "Menunggu Verifikasi" |  |
-| 2  | Paslon mendaftar dengan visi < 10 karakter     | Muncul error "Visi terlalu pendek (minimal 10 karakter)."  |        |
-| 3  | Paslon mendaftar dua kali                      | Diredirect ke daftar paslon, pesan "Anda sudah terdaftar"  |        |
-| 4  | Pengawas menyetujui paslon                     | Status berubah ke "Disetujui", nomor paslon ditetapkan otomatis |   |
-| 5  | Pengawas menolak paslon                        | Status berubah ke "Ditolak"                                 |        |
-| 6  | Pemilih mencoba akses /candidates/register/    | Ditolak (403 Forbidden) karena middleware RBAC              |        |
-| 7  | Approve/reject tanpa CSRF token                | Request ditolak (403 CSRF verification failed)             |        |
-| 8  | Paslon yang sudah diapprove di-approve lagi    | Pesan "Paslon sudah diverifikasi sebelumnya"               |        |
+| 1  | Paslon mendaftar dengan data lengkap           | Data tersimpan, redirect ke daftar paslon, status "Menunggu Verifikasi" | PASS |
+| 2  | Paslon mendaftar dengan visi < 10 karakter     | Muncul error "Visi terlalu pendek (minimal 10 karakter)."  | PASS |
+| 3  | Paslon mendaftar dua kali                      | Diredirect ke daftar paslon, pesan "Anda sudah terdaftar"  | PASS |
+| 4  | Pengawas menyetujui paslon                     | Status berubah ke "Disetujui", nomor paslon ditetapkan otomatis | PASS |
+| 5  | Pengawas menolak paslon                        | Status berubah ke "Ditolak"                                 | PASS |
+| 6  | Pemilih mencoba akses /candidates/register/    | Ditolak (403 Forbidden) karena RBAC                         | PASS |
+| 7  | Approve/reject tanpa CSRF token                | Request ditolak (403 CSRF verification failed)             | PASS |
+| 8  | Paslon yang sudah diapprove di-approve lagi    | Pesan "Paslon sudah diverifikasi sebelumnya"               | PASS |
+| 9  | Pemilih melihat daftar/detail paslon           | Hanya paslon approved yang ditampilkan                      | PASS |
 
 #### Test Case — Modul 4: Pemungutan Suara
 
 | No | Test Case                                      | Expected Result                                             | Status |
 | -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
-| 1  | Pemilih submit vote untuk paslon yang disetujui | Vote tercatat, redirect ke halaman sukses                  |        |
-| 2  | Pemilih mencoba vote dua kali                  | Diredirect ke results, pesan "Anda sudah melakukan voting"  |        |
-| 3  | Paslon mencoba akses /voting/                  | Ditolak (403 Forbidden) karena middleware RBAC              |        |
-| 4  | Vote tanpa CSRF token                          | Request ditolak (403 CSRF verification failed)             |        |
-| 5  | Vote tanpa memilih paslon                      | Muncul error "Pilih salah satu paslon."                    |        |
-| 6  | Hasil voting menampilkan jumlah suara per paslon | Vote count ditampilkan dengan progress bar                |        |
-| 7  | IntegrityError saat double vote (race condition) | Ditangkap oleh try/except, pesan error ditampilkan        |        |
+| 1  | Pemilih submit vote untuk paslon yang disetujui | Vote tercatat, redirect ke halaman sukses                  | PASS |
+| 2  | Pemilih mencoba vote dua kali                  | Diredirect ke results, pesan "Anda sudah melakukan voting"  | PASS |
+| 3  | Paslon mencoba akses /voting/                  | Ditolak (403 Forbidden) karena middleware RBAC              | PASS |
+| 4  | Vote tanpa CSRF token                          | Request ditolak (403 CSRF verification failed)             | PASS |
+| 5  | Vote tanpa memilih paslon                      | Muncul error "Pilih salah satu paslon."                    | PASS |
+| 6  | Hasil voting menampilkan jumlah suara per paslon | Vote count ditampilkan dengan progress bar                | PASS |
+| 7  | IntegrityError saat double vote (race condition) | Ditangkap oleh try/except, pesan error ditampilkan        | PASS |
+| 8  | Akses rekap tanpa login                        | Diredirect ke halaman login                                | PASS |
 
 #### Test Case — Modul 5: Rekapitulasi & Audit
 
 | No | Test Case                                      | Expected Result                                             | Status |
 | -- | ---------------------------------------------- | ----------------------------------------------------------- | ------ |
-| 1  | Dashboard menampilkan total suara dan rekapitulasi | Angka benar, progress bar sesuai proporsi                |        |
-| 2  | Audit log mencatat login                       | Tercatat dengan username, IP, dan timestamp                |        |
-| 3  | Audit log mencatat logout                      | Tercatat dengan username dan timestamp                     |        |
-| 4  | Audit log mencatat voter create/update/delete  | Tercatat dengan nama pemilih dan NIK                       |        |
-| 5  | Audit log mencatat candidate approve/reject    | Tercatat dengan nama paslon dan nomor paslon               |        |
-| 6  | Audit log mencatat vote                        | Tercatat dengan username dan nama paslon yang dipilih      |        |
-| 7  | Halaman audit log menampilkan 100 log terbaru  | Tabel berisi waktu, user, IP, aksi, dan detail             |        |
+| 1  | Dashboard menampilkan total suara dan rekapitulasi | Angka benar, progress bar sesuai proporsi                | PASS |
+| 2  | Audit log mencatat login                       | Tercatat dengan username, IP, dan timestamp                | PASS |
+| 3  | Audit log mencatat logout                      | Tercatat dengan username dan timestamp                     | PASS |
+| 4  | Audit log mencatat voter create/update/delete  | Tercatat dengan nama pemilih dan NIK                       | PASS |
+| 5  | Audit log mencatat candidate approve/reject    | Tercatat dengan nama paslon dan nomor paslon               | PASS |
+| 6  | Audit log mencatat vote                        | Tercatat dengan username dan nama paslon yang dipilih      | PASS |
+| 7  | Halaman audit log menampilkan 100 log terbaru  | Tabel berisi waktu, user, IP, aksi, dan detail             | PASS |
 
 ---
 
@@ -366,14 +388,15 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-4. Jalankan migrasi dan buat superuser (pengawas):
+4. Jalankan migrasi dan buat superuser dengan role pengawas:
 
 ```bash
 python manage.py migrate
-python manage.py createsuperuser
+python manage.py createsuperuser --username admin --email admin@example.com
+python manage.py shell -c "from apps.authentication.models import User; User.objects.filter(username='admin').update(role=User.Role.PENGAWAS)"
 ```
 
-5. (Opsional) Seed database dengan data contoh:
+5. (Opsional) Seed database SQLite dengan data contoh:
 
 ```bash
 python manage.py seed --clean --voters 25
@@ -395,6 +418,8 @@ Data yang dibuat oleh seeder:
 | **3 Paslon** | `paslon1`, `paslon2`, `paslon3` / `password123` — status approved, dengan anggota |
 | **25 Pemilih** | `pemilih1`–`pemilih25` / `password123` — terhubung ke Voter profile, 75% sudah vote |
 
+Password di atas hanya kredensial demo lokal yang dibuat oleh seeder. Password tetap disimpan sebagai hash PBKDF2 di database.
+
 6. Jalankan development server:
 
 ```bash
@@ -402,6 +427,8 @@ python manage.py runserver
 ```
 
 7. Akses aplikasi di `http://127.0.0.1:8000/`
+
+Catatan database: aplikasi hanya menggunakan SQLite lokal melalui `db.sqlite3`. File tersebut disertakan di repository sesuai ketentuan tugas, sedangkan konfigurasi database eksternal tidak didukung.
 
 ### Struktur Project
 
@@ -424,6 +451,7 @@ PKPL26_21_sariwangi/
 ├── templates/              # Template level project
 ├── static/                 # Static files level project
 ├── media/                  # User-uploaded files
+├── db.sqlite3              # Database SQLite lokal
 ├── manage.py
 ├── requirements.txt
 └── README.md

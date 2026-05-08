@@ -38,6 +38,17 @@ class AuthenticationSecurityTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("password2", form.errors)
 
+    def test_create_user_stores_hashed_password(self):
+        user = User.objects.create_user(
+            username="hashed_user",
+            password="StrongPass123!",
+            role=User.Role.PEMILIH,
+        )
+
+        self.assertNotEqual(user.password, "StrongPass123!")
+        self.assertTrue(user.password.startswith("pbkdf2_"))
+        self.assertTrue(user.check_password("StrongPass123!"))
+
     def test_login_rate_limit_locks_unknown_username_after_five_failures(self):
         client = Client()
         login_url = reverse("authentication:login")

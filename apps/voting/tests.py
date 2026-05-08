@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from apps.authentication.models import User
 from apps.candidates.models import Candidate
+from apps.dashboard.models import AuditLog
 from apps.voters.models import Voter
 
 from .models import Vote
@@ -65,6 +66,7 @@ class VotingSecurityTests(TestCase):
         self.assertRedirects(first_response, reverse("voting:success"))
         self.assertRedirects(second_response, reverse("voting:results"))
         self.assertEqual(Vote.objects.filter(voter=self.pemilih).count(), 1)
+        self.assertTrue(AuditLog.objects.filter(action=AuditLog.Action.VOTE).exists())
 
     def test_results_require_authentication(self):
         response = self.client.get(reverse("voting:results"))
@@ -78,3 +80,12 @@ class VotingSecurityTests(TestCase):
         response = self.client.get(reverse("voting:vote"))
 
         self.assertEqual(response.status_code, 403)
+
+    def test_results_show_vote_count(self):
+        Vote.objects.create(voter=self.pemilih, candidate=self.candidate)
+        self.client.force_login(self.pemilih)
+
+        response = self.client.get(reverse("voting:results"))
+
+        self.assertContains(response, "Paslon Aman")
+        self.assertContains(response, "1")

@@ -288,6 +288,47 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 **Voting - Berhasil**
 ![Voting Berhasil](screenshots/pemilih_voting_berhasil.png)
 
+#### Pengawas
+
+**Login Berhasil**
+![Login Berhasil](screenshots/pengawas_login_success.png)
+
+**Login Gagal**
+![Login Gagal](screenshots/pengawas_login_gagal.png)
+
+**Dashboard Pengawas**
+![Dashboard Pengawas](screenshots/pengawas_dashboard_pengawas.png)
+
+**Kelola Data Pemilih**
+![Kelola Data Pemilih](screenshots/pengawas_kelola_pemilih.png)
+
+**Tambah Pemilih**
+![Tambah Pemilih](screenshots/pengawas_tambah_pemilih.png)
+
+**Validasi Input NIK**
+![Validasi Input NIK](screenshots/pengawas_validasi_input_nik.png)
+
+**Tambah Pemilih - Berhasil**
+![Tambah Pemilih Berhasil](screenshots/pengawas_success_tambah_pemilih.png)
+
+**Kelola Paslon**
+![Kelola Paslon](screenshots/pengawas_kelola_paslon.png)
+
+**Detail Paslon 1**
+![Detail Paslon 1](screenshots/pengawas_detail_paslon1.png)
+
+**Detail Paslon 2**
+![Detail Paslon 2](screenshots/pengawas_detail_paslon2.png)
+
+**Detail Paslon 3**
+![Detail Paslon 3](screenshots/pengawas_detail_paslon3.png)
+
+**Hasil Suara**
+![Hasil Suara](screenshots/pengawas_hasil_suara.png)
+
+**Audit Log**
+![Audit Log](screenshots/pengawas_audit_log.png)
+
 ---
 
 ### 1.4 Hasil Test-Case

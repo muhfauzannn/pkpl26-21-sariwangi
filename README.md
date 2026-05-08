@@ -373,13 +373,35 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-5. Jalankan development server:
+5. (Opsional) Seed database dengan data contoh:
+
+```bash
+python manage.py seed --clean --voters 25
+```
+
+Opsi seeder:
+
+| Flag | Default | Deskripsi |
+| --- | --- | --- |
+| `--voters N` | 25 | Jumlah pemilih yang dibuat |
+| `--voted 0.75` | 0.75 | Persentase pemilih yang sudah vote (0.0–1.0) |
+| `--clean` | - | Hapus semua data sebelum seeding |
+
+Data yang dibuat oleh seeder:
+
+| Data | Detail |
+| --- | --- |
+| **Pengawas** | `pengawas` / `password123` |
+| **3 Paslon** | `paslon1`, `paslon2`, `paslon3` / `password123` — status approved, dengan anggota |
+| **25 Pemilih** | `pemilih1`–`pemilih25` / `password123` — terhubung ke Voter profile, 75% sudah vote |
+
+6. Jalankan development server:
 
 ```bash
 python manage.py runserver
 ```
 
-6. Akses aplikasi di `http://127.0.0.1:8000/`
+7. Akses aplikasi di `http://127.0.0.1:8000/`
 
 ### Struktur Project
 

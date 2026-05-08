@@ -279,9 +279,6 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 **Hasil Suara**
 ![Hasil Suara](screenshots/pemilih_hasil_suara.png)
 
-**Voting - Surat Suara**
-![Voting Surat Suara](screenshots/pemilih_voting_surat_suara.png)
-
 **Voting - Pilih Paslon**
 ![Voting Pilih Paslon](screenshots/pemilih_voting_pilih_paslon.png)
 

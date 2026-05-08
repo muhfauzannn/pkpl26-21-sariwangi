@@ -35,7 +35,7 @@ Pengantar Keamanan Perangkat Lunak — Genap 2025/2026
 | ----------------- | ---------------------- |
 | Backend Framework | Django                 |
 | Database          | SQLite                 |
-| Frontend          | HTML, CSS, Inter + JetBrains Mono |
+| Frontend          | HTML, CSS              |
 | Authentication    | Session-based          |
 | Password Hashing  | PBKDF2                 |
 | ORM               | Django ORM             |

@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% if user.is_authenticated %}layout-app{% else %}layout-auth{% endif %}">
+
 {% if user.is_authenticated %}
     <aside class="sidebar" id="sidebar">
         <div class="sidebar__header">
@@ -97,6 +98,7 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
 {% else %}
     <nav class="top-nav">
         <div class="container">
@@ -117,7 +119,9 @@
             {% endfor %}
         {% endif %}
 
-        {% block content %}{% endblock %}
+        <div class="auth-content">
+            {% block auth_content %}{% endblock %}
+        </div>
     </div>
 {% endif %}
 

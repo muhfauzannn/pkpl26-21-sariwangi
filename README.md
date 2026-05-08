@@ -274,7 +274,7 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 ![Detail Paslon 2](screenshots/pemilih_detail_paslon_2.png)
 
 **Detail Paslon 3**
-![Detail Paslon 3](screenshots/pemilih_detail_paslon_3.png)
+![Detail Paslon 3](screenshots/pemilih_detail_paslon_3_.png)
 
 **Hasil Suara**
 ![Hasil Suara](screenshots/pemilih_hasil_suara.png)

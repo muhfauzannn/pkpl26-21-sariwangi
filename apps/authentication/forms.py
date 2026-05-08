@@ -37,6 +37,28 @@ class RegistrationForm(forms.ModelForm):
         widget=forms.Select(),
     )
 
+    # Extra fields for pemilih
+    nik = forms.CharField(
+        max_length=16,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "16 digit NIK"}),
+    )
+    npm = forms.CharField(
+        max_length=15,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "NPM"}),
+    )
+    faculty = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "Fakultas"}),
+    )
+    study_program = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "Program studi"}),
+    )
+
     class Meta:
         model = User
         fields = ["username", "email", "first_name", "last_name", "role"]
@@ -59,3 +81,29 @@ class RegistrationForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Password tidak cocok.")
         return password2
+
+    def clean(self):
+        cleaned = super().clean()
+        role = cleaned.get("role")
+        if role == User.Role.PEMILIH:
+            nik = cleaned.get("nik", "").strip()
+            npm = cleaned.get("npm", "").strip()
+            faculty = cleaned.get("faculty", "").strip()
+            study_program = cleaned.get("study_program", "").strip()
+
+            import re
+            if not nik or not re.match(r"^\d{16}$", nik):
+                self.add_error("nik", "NIK harus terdiri dari 16 digit angka.")
+            if not npm or not re.match(r"^\d+$", npm):
+                self.add_error("npm", "NPM harus terdiri dari digit angka.")
+            if not faculty:
+                self.add_error("faculty", "Fakultas wajib diisi.")
+            if not study_program:
+                self.add_error("study_program", "Program studi wajib diisi.")
+
+            from apps.voters.models import Voter
+            if nik and not self.has_error("nik") and Voter.objects.filter(nik=nik).exists():
+                self.add_error("nik", "NIK sudah terdaftar.")
+            if npm and not self.has_error("npm") and Voter.objects.filter(npm=npm).exists():
+                self.add_error("npm", "NPM sudah terdaftar.")
+        return cleaned

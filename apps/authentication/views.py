@@ -69,6 +69,20 @@ class RegisterView(FormView):
         )
         user.is_active = True
         user.save()
+
+        if form.cleaned_data["role"] == User.Role.PEMILIH:
+            from apps.voters.models import Voter
+            Voter.objects.create(
+                user=user,
+                nik=form.cleaned_data["nik"],
+                npm=form.cleaned_data["npm"],
+                email=form.cleaned_data["email"],
+                full_name=f"{form.cleaned_data['first_name']} {form.cleaned_data['last_name']}".strip(),
+                faculty=form.cleaned_data["faculty"],
+                study_program=form.cleaned_data["study_program"],
+                status=Voter.Status.ACTIVE,
+            )
+
         messages.success(self.request, "Registrasi berhasil. Silakan login.")
         return super().form_valid(form)
 

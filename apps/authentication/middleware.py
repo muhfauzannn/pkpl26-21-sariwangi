@@ -16,7 +16,7 @@ class RoleBasedAccessControlMiddleware:
 
     ROLE_PATHS = {
         "pengawas": ["/"],
-        "pemilih": ["/voting/", "/dashboard/audit-log/", "/auth/logout/"],
+        "pemilih": ["/voting/", "/candidates/", "/dashboard/audit-log/", "/auth/logout/"],
         "paslon": ["/candidates/", "/voting/results/", "/dashboard/audit-log/", "/auth/logout/"],
     }
 

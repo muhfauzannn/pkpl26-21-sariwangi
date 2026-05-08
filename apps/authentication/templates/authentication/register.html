@@ -92,6 +92,52 @@
                 {% endfor %}
             </div>
 
+            <!-- Pemilih-only fields -->
+            <div id="pemilih-fields" style="display:none; border-top:1px solid var(--color-hairline); padding-top:var(--spacing-lg); margin-top:var(--spacing-lg);">
+                <p class="text-eyebrow" style="margin-bottom:var(--spacing-md);">Data Pemilih</p>
+
+                <div class="form-group">
+                    <label for="id_nik" class="form-label">NIK <span style="color:var(--color-error);">*</span></label>
+                    <input type="text" name="nik" id="id_nik" maxlength="16"
+                           class="form-input {% if form.nik.errors %}is-invalid{% endif %}"
+                           value="{{ form.nik.value|default:'' }}" placeholder="16 digit NIK">
+                    {% for error in form.nik.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_npm" class="form-label">NPM <span style="color:var(--color-error);">*</span></label>
+                    <input type="text" name="npm" id="id_npm" maxlength="15"
+                           class="form-input {% if form.npm.errors %}is-invalid{% endif %}"
+                           value="{{ form.npm.value|default:'' }}" placeholder="NPM">
+                    {% for error in form.npm.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_faculty" class="form-label">Fakultas <span style="color:var(--color-error);">*</span></label>
+                        <input type="text" name="faculty" id="id_faculty"
+                               class="form-input {% if form.faculty.errors %}is-invalid{% endif %}"
+                               value="{{ form.faculty.value|default:'' }}" placeholder="Fakultas">
+                        {% for error in form.faculty.errors %}
+                            <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_study_program" class="form-label">Program Studi <span style="color:var(--color-error);">*</span></label>
+                        <input type="text" name="study_program" id="id_study_program"
+                               class="form-input {% if form.study_program.errors %}is-invalid{% endif %}"
+                               value="{{ form.study_program.value|default:'' }}" placeholder="Program studi">
+                        {% for error in form.study_program.errors %}
+                            <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-full">Daftar</button>
         </form>
 
@@ -100,4 +146,16 @@
         </p>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('id_role').addEventListener('change', function() {
+    document.getElementById('pemilih-fields').style.display = this.value === 'pemilih' ? 'block' : 'none';
+});
+// Show on load if already selected
+if (document.getElementById('id_role').value === 'pemilih') {
+    document.getElementById('pemilih-fields').style.display = 'block';
+}
+</script>
 {% endblock %}

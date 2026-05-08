@@ -1,23 +1,22 @@
 {% extends "base.html" %}
 
 {% block title %}Dashboard - E-Voting System{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
 
 {% block content %}
-<p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Pengawas Pemilu</p>
-<h1 class="text-headline" style="margin-bottom:var(--spacing-xl);">Dashboard</h1>
-
-<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:var(--spacing-md); margin-bottom:var(--spacing-xl);">
-    <div class="card" style="text-align:center;">
-        <p class="text-caption" style="margin-bottom:var(--spacing-xxs);">Total Suara</p>
-        <p class="text-display-lg" style="font-weight:540; letter-spacing:-0.5px;">{{ total_votes }}</p>
+<div class="stats-grid">
+    <div class="stat-card">
+        <p class="stat-card__value">{{ total_votes }}</p>
+        <p class="stat-card__label">Total Suara Masuk</p>
     </div>
-    <div class="card" style="text-align:center;">
-        <p class="text-caption" style="margin-bottom:var(--spacing-xxs);">Paslon Disetujui</p>
-        <p class="text-display-lg" style="font-weight:540; letter-spacing:-0.5px;">{{ total_candidates }}</p>
+    <div class="stat-card">
+        <p class="stat-card__value">{{ total_candidates }}</p>
+        <p class="stat-card__label">Paslon Disetujui</p>
     </div>
-    <div class="card" style="text-align:center;">
-        <p class="text-caption" style="margin-bottom:var(--spacing-xxs);">Paslon Menunggu</p>
-        <p class="text-display-lg" style="font-weight:540; letter-spacing:-0.5px;">{{ pending_candidates }}</p>
+    <div class="stat-card">
+        <p class="stat-card__value">{{ pending_candidates }}</p>
+        <p class="stat-card__label">Paslon Menunggu Verifikasi</p>
     </div>
 </div>
 
@@ -30,59 +29,58 @@
             <span class="text-caption">No. {{ item.candidate.candidate_number }}</span>
             <span class="text-body-lg" style="font-weight:540; margin-left:var(--spacing-xs);">{{ item.candidate.name }}</span>
         </div>
-        <span style="font-size:24px; font-weight:540;">{{ item.vote_count }} <span class="text-body-sm" style="color:var(--color-hairline);">suara</span></span>
+        <span style="font-size:24px; font-weight:540;">{{ item.vote_count }} <span class="text-body-sm" style="color:#888;">suara</span></span>
     </div>
-    <div style="background:var(--color-surface-soft); border-radius:var(--rounded-sm); height:12px; overflow:hidden;">
+    <div class="progress-bar">
         {% if total_votes > 0 %}
             {% widthratio item.vote_count total_votes 100 as percent %}
-            <div style="background:var(--color-primary); height:100%; width:{{ percent }}%; border-radius:var(--rounded-sm); transition:width 0.3s;"></div>
+            <div class="progress-bar__fill" style="width:{{ percent }}%;"></div>
         {% endif %}
     </div>
 </div>
 {% empty %}
-<div class="card" style="text-align:center; padding:var(--spacing-xxl); color:var(--color-hairline);">
-    Belum ada paslon yang disetujui.
+<div class="empty-state">
+    <div class="empty-state__icon">&#128203;</div>
+    <p class="empty-state__text">Belum ada paslon yang disetujui.</p>
 </div>
 {% endfor %}
 
-<div style="display:flex; gap:var(--spacing-sm); margin-top:var(--spacing-xl); margin-bottom:var(--spacing-xl);">
-    <a href="{% url 'dashboard:audit_log' %}" class="btn btn-secondary">Lihat Audit Log</a>
-    <a href="{% url 'candidates:list' %}" class="btn btn-secondary">Kelola Paslon</a>
-    <a href="{% url 'voters:list' %}" class="btn btn-secondary">Kelola Pemilih</a>
+<div style="display:flex; gap:var(--spacing-sm); margin-top:var(--spacing-xl); margin-bottom:var(--spacing-xl); flex-wrap:wrap;">
+    <a href="{% url 'voters:list' %}" class="btn btn-secondary btn-sm">Kelola Pemilih</a>
+    <a href="{% url 'candidates:list' %}" class="btn btn-secondary btn-sm">Kelola Paslon</a>
+    <a href="{% url 'dashboard:audit_log' %}" class="btn btn-secondary btn-sm">Lihat Audit Log</a>
 </div>
 
 <h2 class="text-body-lg" style="font-weight:540; margin-bottom:var(--spacing-md);">Aktivitas Terbaru</h2>
 
 <div class="card">
-    <table style="width:100%; border-collapse:collapse; font-size:16px;">
-        <thead>
-            <tr style="border-bottom:1px solid var(--color-hairline-soft); text-align:left;">
-                <th style="padding:var(--spacing-sm) var(--spacing-md);">Waktu</th>
-                <th style="padding:var(--spacing-sm) var(--spacing-md);">User</th>
-                <th style="padding:var(--spacing-sm) var(--spacing-md);">Aksi</th>
-                <th style="padding:var(--spacing-sm) var(--spacing-md);">Detail</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in recent_logs %}
-            <tr style="border-bottom:1px solid var(--color-hairline-soft);">
-                <td style="padding:var(--spacing-sm) var(--spacing-md); white-space:nowrap;">{{ log.timestamp|date:"d M H:i" }}</td>
-                <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ log.user.username|default:"-" }}</td>
-                <td style="padding:var(--spacing-sm) var(--spacing-md);">
-                    <span style="background:var(--color-surface-soft); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">
-                        {{ log.get_action_display }}
-                    </span>
-                </td>
-                <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ log.description }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" style="padding:var(--spacing-lg); text-align:center; color:var(--color-hairline);">
-                    Belum ada aktivitas tercatat.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-wrapper" style="border:none;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Waktu</th>
+                    <th>User</th>
+                    <th>Aksi</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in recent_logs %}
+                <tr>
+                    <td style="white-space:nowrap;">{{ log.timestamp|date:"d M H:i" }}</td>
+                    <td>{{ log.user.username|default:"-" }}</td>
+                    <td><span class="badge badge-info">{{ log.get_action_display }}</span></td>
+                    <td>{{ log.description }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        <p class="empty-state__text">Belum ada aktivitas tercatat.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

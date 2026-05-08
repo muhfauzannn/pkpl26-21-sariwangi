@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block title %}Hasil Voting - E-Voting System{% endblock %}
+{% block page_title %}Hasil Voting{% endblock %}
+{% block nav_results %}active{% endblock %}
 
 {% block content %}
-<div style="max-width:640px; margin:0 auto;">
-    <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Rekapitulasi</p>
-    <h1 class="text-headline" style="margin-bottom:var(--spacing-sm);">Hasil Voting</h1>
-    <p class="text-body-sm" style="margin-bottom:var(--spacing-xl); color:var(--color-hairline);">
-        Total suara masuk: {{ total_votes }}
+<div style="max-width:640px;">
+    <p class="text-body-sm" style="margin-bottom:var(--spacing-xl); color:#888;">
+        Total suara masuk: <strong>{{ total_votes }}</strong>
     </p>
 
     {% for item in results %}
@@ -19,14 +19,15 @@
             </div>
             <span class="text-headline" style="color:var(--color-primary);">{{ item.vote_count }}</span>
         </div>
-        <div style="background:var(--color-surface-soft); border-radius:var(--rounded-sm); height:8px; overflow:hidden;">
+        <div class="progress-bar">
             {% widthratio item.vote_count total_votes 100 as percent %}
-            <div style="background:var(--color-primary); height:100%; width:{% if total_votes > 0 %}{{ percent }}{% else %}0{% endif %}%; border-radius:var(--rounded-sm); transition:width 0.3s;"></div>
+            <div class="progress-bar__fill" style="width:{% if total_votes > 0 %}{{ percent }}{% else %}0{% endif %}%;"></div>
         </div>
     </div>
     {% empty %}
-    <div class="card" style="text-align:center; padding:var(--spacing-xxl); color:var(--color-hairline);">
-        Belum ada hasil voting.
+    <div class="empty-state">
+        <div class="empty-state__icon">&#128203;</div>
+        <p class="empty-state__text">Belum ada hasil voting.</p>
     </div>
     {% endfor %}
 </div>

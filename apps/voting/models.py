@@ -17,4 +17,6 @@ class Vote(models.Model):
 
     class Meta:
         db_table = "voting_vote"
-        unique_together = ("voter",)
+        constraints = [
+            models.UniqueConstraint(fields=["voter"], name="unique_vote_per_voter"),
+        ]

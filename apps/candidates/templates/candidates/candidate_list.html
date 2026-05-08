@@ -1,16 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}Daftar Paslon - E-Voting System{% endblock %}
+{% block page_title %}Daftar Paslon{% endblock %}
+{% block nav_candidates %}active{% endblock %}
 
 {% block content %}
-<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--spacing-xl);">
-    <div>
-        <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Paslon</p>
-        <h1 class="text-headline">Daftar Paslon</h1>
-    </div>
+<div class="page-header">
+    <div></div>
     {% if user.role == "paslon" %}
         {% if not user.candidate_profile %}
-            <a href="{% url 'candidates:register' %}" class="btn btn-primary">Daftar Paslon</a>
+            <a href="{% url 'candidates:register' %}" class="btn btn-primary btn-sm">Daftar Paslon</a>
         {% endif %}
     {% endif %}
 </div>
@@ -19,9 +18,9 @@
 <div class="card" style="margin-bottom:var(--spacing-md); display:flex; align-items:center; gap:var(--spacing-lg); flex-wrap:wrap;">
     {% if candidate.photo %}
         <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}"
-             style="width:64px; height:64px; object-fit:cover; border-radius:var(--rounded-md);">
+             style="width:56px; height:56px; object-fit:cover; border-radius:var(--rounded-md);">
     {% else %}
-        <div style="width:64px; height:64px; background:var(--color-surface-soft); border-radius:var(--rounded-md); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:540;">
+        <div style="width:56px; height:56px; background:var(--color-surface-soft); border-radius:var(--rounded-md); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:540;">
             {{ candidate.name|first }}
         </div>
     {% endif %}
@@ -30,24 +29,25 @@
             {% if candidate.candidate_number %}<span class="text-caption" style="margin-right:var(--spacing-xs);">No. {{ candidate.candidate_number }}</span>{% endif %}
             <span class="text-body-lg" style="font-weight:540;">{{ candidate.name }}</span>
         </a>
-        <p class="text-body-sm" style="margin-top:var(--spacing-xxs);">
+        <p class="text-body-sm" style="margin-top:var(--spacing-xxs); color:#888;">
             {% if candidate.members.count %}{{ candidate.members.count }} anggota &middot; {% endif %}
             {{ candidate.visi|truncatechars:80 }}
         </p>
     </div>
     <div>
         {% if candidate.status == "pending" %}
-            <span style="background:var(--color-block-cream); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Menunggu Verifikasi</span>
+            <span class="badge badge-warning">Menunggu Verifikasi</span>
         {% elif candidate.status == "approved" %}
-            <span style="background:var(--color-block-mint); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Disetujui</span>
+            <span class="badge badge-success">Disetujui</span>
         {% else %}
-            <span style="background:var(--color-block-coral); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Ditolak</span>
+            <span class="badge badge-danger">Ditolak</span>
         {% endif %}
     </div>
 </div>
 {% empty %}
-<div class="card" style="text-align:center; padding:var(--spacing-xxl); color:var(--color-hairline);">
-    Belum ada paslon terdaftar.
+<div class="empty-state">
+    <div class="empty-state__icon">&#128203;</div>
+    <p class="empty-state__text">Belum ada paslon terdaftar.</p>
 </div>
 {% endfor %}
 {% endblock %}

@@ -1,61 +1,64 @@
 {% extends "base.html" %}
 
 {% block title %}Daftar Pemilih - E-Voting System{% endblock %}
+{% block page_title %}Data Pemilih{% endblock %}
+{% block nav_voters %}active{% endblock %}
 
 {% block content %}
-<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--spacing-xl);">
-    <div>
-        <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Manajemen Data</p>
-        <h1 class="text-headline">Daftar Pemilih</h1>
-    </div>
-    <a href="{% url 'voters:create' %}" class="btn btn-primary">Tambah Pemilih</a>
+<div class="page-header">
+    <div></div>
+    <a href="{% url 'voters:create' %}" class="btn btn-primary btn-sm">Tambah Pemilih</a>
 </div>
 
-<table style="width:100%; border-collapse:collapse; font-size:16px;">
-    <thead>
-        <tr style="border-bottom:1px solid var(--color-hairline-soft); text-align:left;">
-            <th style="padding:var(--spacing-sm) var(--spacing-md);">Nama</th>
-            <th style="padding:var(--spacing-sm) var(--spacing-md);">NIK</th>
-            <th style="padding:var(--spacing-sm) var(--spacing-md);">NPM</th>
-            <th style="padding:var(--spacing-sm) var(--spacing-md);">Fakultas</th>
-            <th style="padding:var(--spacing-sm) var(--spacing-md);">Status</th>
-            <th style="padding:var(--spacing-sm) var(--spacing-md);">Memilih</th>
-            <th style="padding:var(--spacing-sm) var(--spacing-md);"></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for voter in voters %}
-        <tr style="border-bottom:1px solid var(--color-hairline-soft);">
-            <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ voter.full_name }}</td>
-            <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ voter.nik }}</td>
-            <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ voter.npm }}</td>
-            <td style="padding:var(--spacing-sm) var(--spacing-md);">{{ voter.faculty }}</td>
-            <td style="padding:var(--spacing-sm) var(--spacing-md);">
-                {% if voter.status == "active" %}
-                    <span style="background:var(--color-block-mint); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Aktif</span>
-                {% else %}
-                    <span style="background:var(--color-block-cream); padding:var(--spacing-xxs) var(--spacing-sm); border-radius:var(--rounded-sm); font-size:14px;">Nonaktif</span>
-                {% endif %}
-            </td>
-            <td style="padding:var(--spacing-sm) var(--spacing-md);">
-                {% if voter.has_voted %}
-                    <span style="color:var(--color-success);">&#10003;</span>
-                {% else %}
-                    <span style="color:var(--color-hairline);">&#10005;</span>
-                {% endif %}
-            </td>
-            <td style="padding:var(--spacing-sm) var(--spacing-md); white-space:nowrap;">
-                <a href="{% url 'voters:update' voter.pk %}" style="text-decoration:none; margin-right:var(--spacing-sm);">Edit</a>
-                <a href="{% url 'voters:delete' voter.pk %}" style="text-decoration:none; color:var(--color-error);">Hapus</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7" style="padding:var(--spacing-xxl); text-align:center; color:var(--color-hairline);">
-                Belum ada data pemilih.
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card">
+    <div class="table-wrapper" style="border:none;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>NIK</th>
+                    <th>NPM</th>
+                    <th>Fakultas</th>
+                    <th>Status</th>
+                    <th>Memilih</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for voter in voters %}
+                <tr>
+                    <td>{{ voter.full_name }}</td>
+                    <td style="font-family:var(--font-mono); font-size:13px;">{{ voter.nik }}</td>
+                    <td style="font-family:var(--font-mono); font-size:13px;">{{ voter.npm }}</td>
+                    <td>{{ voter.faculty }}</td>
+                    <td>
+                        {% if voter.status == "active" %}
+                            <span class="badge badge-success">Aktif</span>
+                        {% else %}
+                            <span class="badge badge-warning">Nonaktif</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if voter.has_voted %}
+                            <span style="color:var(--color-success);">&#10003;</span>
+                        {% else %}
+                            <span style="color:#ccc;">&#10005;</span>
+                        {% endif %}
+                    </td>
+                    <td style="white-space:nowrap;">
+                        <a href="{% url 'voters:update' voter.pk %}" style="text-decoration:none; margin-right:var(--spacing-sm); font-size:14px;">Edit</a>
+                        <a href="{% url 'voters:delete' voter.pk %}" style="text-decoration:none; color:var(--color-error); font-size:14px;">Hapus</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <p class="empty-state__text">Belum ada data pemilih.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}Daftar Paslon - E-Voting System{% endblock %}
+{% block page_title %}Pendaftaran Paslon{% endblock %}
+{% block nav_candidates %}active{% endblock %}
 
 {% block content %}
-<div style="max-width:600px; margin:0 auto; padding-top:var(--spacing-section);">
-    <div class="card card-elevated">
-        <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Pendaftaran</p>
-        <h1 class="text-headline" style="margin-bottom:var(--spacing-xl);">Daftar Sebagai Paslon</h1>
-
+<div style="max-width:600px;">
+    <div class="card">
         {% if form.non_field_errors %}
             {% for error in form.non_field_errors %}
                 <div class="alert alert-error">
@@ -55,7 +54,7 @@
                 {% endfor %}
             </div>
 
-            <h2 class="text-body-lg" style="font-weight:540; margin-top:var(--spacing-xl); margin-bottom:var(--spacing-md);">Anggota Paslon</h2>
+            <h3 class="text-body-lg" style="font-weight:540; margin-top:var(--spacing-xl); margin-bottom:var(--spacing-md);">Anggota Paslon</h3>
 
             {{ member_formset.management_form }}
             {% for member_form in member_formset %}
@@ -81,8 +80,8 @@
             {% endfor %}
 
             <div style="display:flex; gap:var(--spacing-sm); margin-top:var(--spacing-lg);">
-                <button type="submit" class="btn btn-primary">Kirim Pendaftaran</button>
-                <a href="{% url 'candidates:list' %}" class="btn btn-secondary">Batal</a>
+                <button type="submit" class="btn btn-primary btn-sm">Kirim Pendaftaran</button>
+                <a href="{% url 'candidates:list' %}" class="btn btn-secondary btn-sm">Batal</a>
             </div>
         </form>
     </div>

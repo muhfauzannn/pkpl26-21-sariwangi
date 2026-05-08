@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}Voting - E-Voting System{% endblock %}
+{% block page_title %}Pemungutan Suara{% endblock %}
+{% block nav_vote %}active{% endblock %}
 
 {% block content %}
-<div style="max-width:640px; margin:0 auto;">
-    <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Pemungutan Suara</p>
-    <h1 class="text-headline" style="margin-bottom:var(--spacing-xl);">Pilih Paslon Anda</h1>
-
+<div style="max-width:640px;">
     {% if form.non_field_errors or form.candidate.errors %}
         <div class="alert alert-error" style="margin-bottom:var(--spacing-lg);">
             {% for error in form.candidate.errors %}{{ error }}{% endfor %}
@@ -37,8 +36,9 @@
             </label>
         </div>
         {% empty %}
-        <div class="card" style="text-align:center; padding:var(--spacing-xxl); color:var(--color-hairline);">
-            Belum ada paslon yang disetujui.
+        <div class="empty-state">
+            <div class="empty-state__icon">&#128203;</div>
+            <p class="empty-state__text">Belum ada paslon yang disetujui.</p>
         </div>
         {% endfor %}
 

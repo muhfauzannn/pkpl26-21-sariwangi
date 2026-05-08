@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}{% if form.instance.pk %}Edit Pemilih{% else %}Tambah Pemilih{% endif %} - E-Voting System{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Edit Pemilih{% else %}Tambah Pemilih{% endif %}{% endblock %}
+{% block nav_voters %}active{% endblock %}
 
 {% block content %}
-<div style="max-width:560px; margin:0 auto; padding-top:var(--spacing-section);">
-    <div class="card card-elevated">
-        <p class="text-eyebrow" style="margin-bottom:var(--spacing-xxs);">Manajemen Data</p>
-        <h1 class="text-headline" style="margin-bottom:var(--spacing-xl);">
-            {% if form.instance.pk %}Edit Pemilih{% else %}Tambah Pemilih{% endif %}
-        </h1>
-
+<div style="max-width:560px;">
+    <div class="card">
         {% if form.non_field_errors %}
             {% for error in form.non_field_errors %}
                 <div class="alert alert-error">
@@ -90,8 +87,8 @@
             </div>
 
             <div style="display:flex; gap:var(--spacing-sm); margin-top:var(--spacing-lg);">
-                <button type="submit" class="btn btn-primary">Simpan</button>
-                <a href="{% url 'voters:list' %}" class="btn btn-secondary">Batal</a>
+                <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+                <a href="{% url 'voters:list' %}" class="btn btn-secondary btn-sm">Batal</a>
             </div>
         </form>
     </div>

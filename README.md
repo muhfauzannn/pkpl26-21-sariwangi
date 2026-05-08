@@ -347,7 +347,7 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 1. Clone repository:
 
 ```bash
-git clone https://gitlab.cs.ui.ac.id/<path-to-repo>/PKPL26_21_sariwangi.git
+git clone https://gitlab.cs.ui.ac.id/pkpl26/21-sariwangi/pkpl26_21_sariwangi.git
 cd PKPL26_21_sariwangi
 ```
 

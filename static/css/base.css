@@ -884,3 +884,81 @@ img {
 .flex-wrap { flex-wrap: wrap; }
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
+
+/* ============================================
+   Form Sections
+   ============================================ */
+
+.form-section__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.form-section__header .text-caption {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--rounded-full);
+    font-size: 11px;
+}
+
+/* ============================================
+   File Upload
+   ============================================ */
+
+.file-upload {
+    border: 2px dashed var(--color-hairline);
+    border-radius: var(--rounded-sm);
+    padding: var(--spacing-xxl) var(--spacing-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.file-upload:hover {
+    background: var(--color-surface-soft);
+    border-color: var(--color-primary);
+}
+
+.file-upload__icon {
+    color: #888;
+    margin-bottom: var(--spacing-sm);
+}
+
+.file-upload:hover .file-upload__icon {
+    color: var(--color-primary);
+}
+
+.file-upload__title {
+    font-size: 16px;
+    font-weight: 480;
+    margin-bottom: var(--spacing-xxs);
+}
+
+.file-upload__hint {
+    font-size: 14px;
+    font-weight: 330;
+    color: #888;
+}
+
+/* ============================================
+   Member Row
+   ============================================ */
+
+.member-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--color-hairline-soft);
+}
+
+.member-row:last-child {
+    border-bottom: none;
+}

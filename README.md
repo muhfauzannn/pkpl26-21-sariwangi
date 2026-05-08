@@ -258,35 +258,59 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 - Koneksi database dibatasi ke SQLite lokal (`db.sqlite3`), tanpa dukungan konfigurasi database eksternal
 - **Audit logging** (`apps/dashboard/services.py`): Setiap aksi penting (login, logout, vote, CRUD pemilih, approve/reject paslon) dicatat ke model `AuditLog` dengan user, action, description, IP address, dan timestamp
 
----
 
 ### 1.3 Screenshot Aplikasi
 
-#### Pemilih
+#### Authentication
+##### Login
+![Login](screenshots/Login_-_E-Voting_System.png)
 
-**Daftar Paslon**
-![Daftar Paslon](screenshots/pemilih_daftar_paslon.png)
+##### Login Gagal - Akun Terkunci (5x Salah)
+![Login Salah](screenshots/Login_Salah___5x_Akun_Locked.png)
 
-**Detail Paslon 1**
-![Detail Paslon 1](screenshots/pemilih_detail_paslon_1.png)
+##### Registrasi
+![Registrasi](screenshots/Registrasi_-_E-Voting_System.png)
 
-**Detail Paslon 2**
-![Detail Paslon 2](screenshots/pemilih_detail_paslon_2.png)
+#### Paslon
+##### Daftar Paslon
+![Daftar Paslon](screenshots/Daftar_Paslon_-_E-Voting_System.png)
 
-**Detail Paslon 3**
-![Detail Paslon 3](screenshots/pemilih_detail_paslon_3_.png)
+##### Paslon 1 - Harapan Bangsa
+![Paslon Harapan Bangsa](screenshots/Paslon_Harapan_Bangsa_-_E-Voting_System.png)
 
-**Hasil Suara**
-![Hasil Suara](screenshots/pemilih_hasil_suara.png)
+##### Paslon 2 - Maju Bersama
+![Paslon Maju Bersama](screenshots/Paslon_Maju_Bersama_-_E-Voting_System.png)
 
-**Voting - Pilih Paslon**
-![Voting Pilih Paslon](screenshots/pemilih_voting_pilih_paslon.png)
+##### Paslon 3 - Untuk Rakyat
+![Paslon Untuk Rakyat](screenshots/Paslon_Untuk_Rakyat_-_E-Voting_System.png)
 
-**Voting - Konfirmasi**
-![Voting Konfirmasi](screenshots/pemilih_voting_konfirmasi.png)
+#### Voting
+##### Surat Suara
+![Surat Suara](screenshots/Surat_Suara_-_E-Voting_System.png)
 
-**Voting - Berhasil**
-![Voting Berhasil](screenshots/pemilih_voting_berhasil.png)
+##### Pilih Paslon 1
+![Pilih 1](screenshots/Surat_Suara_-_E-Voting_System__pilih_1_.png)
+
+##### Pilih Paslon 2
+![Pilih 2](screenshots/Surat_Suara_-_E-Voting_System__pilih_2_.png)
+
+##### Pilih Paslon 3
+![Pilih 3](screenshots/Surat_Suara_-_E-Voting_System__pilih_3_.png)
+
+##### Konfirmasi Pilihan
+![Konfirmasi](screenshots/Surat_Suara_-_E-Voting_System__pilih_paslon_.png)
+
+##### Voting Berhasil
+![Voting Berhasil](screenshots/Voting_Berhasil_-_E-Voting_System.png)
+
+#### Hasil Voting
+##### Lihat Hasil
+![Hasil Voting](screenshots/Hasil_Voting_-_E-Voting_System__lihat_hasil_.png)
+
+#### Security
+##### Password Ter-hash di Database
+![Password Hash](screenshots/Password_ter-hash_di_Database.png)
+Bagian securtiy lainnya akan kami demokan divideo.
 
 #### Pengawas
 
@@ -329,49 +353,7 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 **Audit Log**
 ![Audit Log](screenshots/pengawas_audit_log.png)
 
-#### Pemilih
-
-**Login**
-![Login](screenshots/Login - E-Voting System.png)
-
-**Registrasi**
-![Registrasi](screenshots/Registrasi - E-Voting System.png)
-
-**Daftar Paslon**
-![Daftar Paslon](screenshots/Daftar Paslon - E-Voting System.png)
-
-**Detail Paslon 1**
-![Detail Paslon 1](screenshots/Paslon Harapan Bangsa - E-Voting System.png)
-
-**Detail Paslon 2**
-![Detail Paslon 2](screenshots/Paslon Maju Bersama - E-Voting System.png)
-
-**Detail Paslon 3**
-![Detail Paslon 3](screenshots/Paslon Untuk Rakyat - E-Voting System.png)
-
-**Voting - Pilih Paslon 1**
-![Voting Pilih Paslon 1](screenshots/Surat Suara - E-Voting System (pilih 1).png)
-
-**Voting - Pilih Paslon 2**
-![Voting Pilih Paslon 2](screenshots/Surat Suara - E-Voting System (pilih 2).png)
-
-**Voting - Pilih Paslon 3**
-![Voting Pilih Paslon 3](screenshots/Surat Suara - E-Voting System (pilih 3).png)
-
-**Voting - Konfirmasi Pilihan**
-![Voting Konfirmasi](screenshots/Surat suara - E-Voting System (pilih paslon).png)
-
-**Voting Berhasil**
-![Voting Berhasil](screenshots/Voting Berhasil - E-Voting System.png)
-
-**Hasil Voting**
-![Hasil Voting](screenshots/Hasil Voting - E-Voting System (lihat hasil).png)
-
-**Login Salah > 5x Akun Locked**
-![Login Locked](screenshots/Login Salah > 5x Akun Locked.png)
-
-**Password Ter-hash di Database**
-![Password Hash Database](screenshots/Password ter-hash di Database.png)
+#### Paslon
 
 ---
 

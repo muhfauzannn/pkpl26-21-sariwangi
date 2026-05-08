@@ -1,0 +1,24 @@
+/* Auth page layout */
+
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-section);
+  padding-bottom: var(--spacing-section);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+}
+
+@media (max-width: 560px) {
+  .auth-wrapper {
+    padding-top: var(--spacing-xxl);
+    padding-bottom: var(--spacing-xxl);
+  }
+
+  .text-headline {
+    font-size: 22px;
+  }
+}

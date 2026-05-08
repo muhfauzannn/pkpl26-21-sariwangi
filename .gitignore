@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.coverage
+htmlcov/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Database
+*.sqlite3
+!db.sqlite3
+
+# Static files collected for production
+staticfiles/
+
+# Media uploads
+media/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+/AGENTS.md
+/DESIGN.md
+/ASSIGNMENT.md

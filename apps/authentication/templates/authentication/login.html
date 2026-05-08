@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login - E-Voting System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'authentication/css/auth.css' %}">
+{% endblock %}
+
+{% block auth_content %}
+<div class="auth-wrapper">
+    <div class="auth-card card card-elevated">
+        <p class="text-eyebrow mb-md">E-Voting System</p>
+        <h1 class="text-headline mb-xl">Login</h1>
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-error">
+                    {{ error }}
+                    <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" name="username" id="id_username"
+                       class="form-input {% if form.username.errors %}is-invalid{% endif %}"
+                       value="{{ form.username.value|default:'' }}" placeholder="Username" required>
+                {% for error in form.username.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password" class="form-label">Password</label>
+                <input type="password" name="password" id="id_password"
+                       class="form-input {% if form.password.errors %}is-invalid{% endif %}"
+                       placeholder="Password" required>
+                {% for error in form.password.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Login</button>
+        </form>
+
+        <p class="text-center mt-lg text-body-sm">
+            Belum punya akun? <a href="{% url 'authentication:register' %}">Daftar di sini</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Log - E-Voting System{% endblock %}
+{% block page_title %}Audit Log{% endblock %}
+{% block nav_audit %}active{% endblock %}
+
+{% block content %}
+<p class="text-body-sm" style="color:#888; margin-bottom:var(--spacing-xl);">Seluruh aktivitas sistem tercatat untuk audit keamanan.</p>
+
+<div class="card" style="padding:0; overflow:hidden;">
+    <!-- Header -->
+    <div style="padding:var(--spacing-md) var(--spacing-lg); border-bottom:1px solid var(--color-hairline-soft); background:var(--color-surface-soft); display:flex; justify-content:space-between; align-items:center;">
+        <span class="text-body-sm" style="font-weight:480;">{{ logs|length }} entri terbaru</span>
+        <span class="text-caption">Sorted by newest</span>
+    </div>
+
+    <!-- Log entries -->
+    {% for log in logs %}
+    <div class="audit-entry" style="padding:var(--spacing-md) var(--spacing-lg); border-bottom:1px solid var(--color-hairline-soft); display:flex; gap:var(--spacing-md); align-items:flex-start;">
+        <div class="audit-entry__icon" style="margin-top:2px;">
+            {% if log.action == "vote" %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+            {% elif log.action == "login" %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            {% elif log.action == "logout" %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            {% elif log.action == "candidate_approve" %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            {% elif log.action == "candidate_reject" %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-error)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            {% else %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            {% endif %}
+        </div>
+        <div style="flex:1; min-width:0;">
+            <div style="display:flex; align-items:center; gap:var(--spacing-sm); margin-bottom:var(--spacing-xxs);">
+                <span class="badge badge-info">{{ log.get_action_display }}</span>
+                <span class="text-body-sm">{{ log.description }}</span>
+            </div>
+            <div class="audit-entry__meta">
+                <span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    {{ log.user.username|default:"System" }}
+                </span>
+                <span style="font-family:var(--font-mono);">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;"><rect x="2" y="2" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/></svg>
+                    {{ log.ip_address|default:"-" }}
+                </span>
+                <span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {{ log.timestamp|date:"d M Y, H:i" }}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state" style="padding:var(--spacing-xxl);">
+        <div class="empty-state__icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <p class="empty-state__text">Belum ada aktivitas tercatat.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

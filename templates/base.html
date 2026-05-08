@@ -1,0 +1,132 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}E-Voting System{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@320;330;340;480;540;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% if user.is_authenticated %}layout-app{% else %}layout-auth{% endif %}">
+
+{% if user.is_authenticated %}
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar__header">
+            <a class="sidebar__brand" href="/">E-Voting</a>
+            <button class="sidebar__toggle" id="sidebar-close" onclick="document.getElementById('sidebar').classList.remove('open')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <div class="sidebar__user">
+            <div class="sidebar__avatar">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+            <div class="sidebar__user-info">
+                <span class="sidebar__user-name">{{ user.first_name }} {{ user.last_name }}</span>
+                <span class="sidebar__user-role">{{ user.get_role_display }}</span>
+            </div>
+        </div>
+
+        <nav class="sidebar__nav">
+            {% if user.role == "pengawas" %}
+            <a href="/dashboard/" class="sidebar__link {% block nav_dashboard %}{% endblock %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </a>
+            <a href="/voters/" class="sidebar__link {% block nav_voters %}{% endblock %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Data Pemilih
+            </a>
+            {% endif %}
+
+            <a href="/candidates/" class="sidebar__link {% block nav_candidates %}{% endblock %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                Paslon
+            </a>
+
+            {% if user.role == "pemilih" %}
+            <a href="/voting/" class="sidebar__link {% block nav_vote %}{% endblock %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                Voting
+            </a>
+            {% endif %}
+
+            <a href="/voting/results/" class="sidebar__link {% block nav_results %}{% endblock %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                Hasil Suara
+            </a>
+
+            {% if user.role == "pengawas" %}
+            <a href="/dashboard/audit-log/" class="sidebar__link {% block nav_audit %}{% endblock %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Audit Log
+            </a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar__footer">
+            <form method="post" action="{% url 'authentication:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="sidebar__logout">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('open')"></div>
+
+    <main class="main-content">
+        <header class="main-header">
+            <button class="main-header__menu" onclick="document.getElementById('sidebar').classList.toggle('open')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <h1 class="main-header__title">{% block page_title %}{% endblock %}</h1>
+        </header>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="main-body">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+{% else %}
+    <nav class="top-nav">
+        <div class="container">
+            <a class="top-nav__brand" href="/">E-Voting System</a>
+            <div class="top-nav__actions">
+                <a class="btn btn-secondary btn-sm" href="{% url 'authentication:login' %}">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: var(--spacing-xl); padding-bottom: var(--spacing-section);">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="auth-content">
+            {% block auth_content %}{% endblock %}
+        </div>
+    </div>
+{% endif %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Registrasi Paslon - E-Voting System{% endblock %}
+{% block page_title %}Registrasi Paslon{% endblock %}
+{% block nav_candidates %}active{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;">
+    <p class="text-body-sm" style="color:#888; margin-bottom:var(--spacing-lg);">Lengkapi data profil dan visi misi kandidat.</p>
+
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-error">
+                {{ error }}
+                <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Notice -->
+    <div class="alert alert-warning" style="margin-bottom:var(--spacing-xl);">
+        <span>
+            <strong>Penting:</strong> Data paslon hanya dapat diubah sebelum proses verifikasi selesai. Pastikan semua informasi yang diunggah sudah benar dan final.
+        </span>
+        <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- Section 1: Data Kandidat -->
+        <div class="form-section" style="margin-bottom:var(--spacing-xl);">
+            <div class="form-section__header">
+                <span class="text-caption">01</span>
+                <h3 class="text-body-lg" style="font-weight:540;">Data Kandidat</h3>
+            </div>
+            <div class="card">
+                <div class="form-group">
+                    <label for="id_name" class="form-label">Nama Paslon <span style="color:var(--color-error);">*</span></label>
+                    <input type="text" name="name" id="id_name"
+                           class="form-input {% if form.name.errors %}is-invalid{% endif %}"
+                           value="{{ form.name.value|default:'' }}" placeholder="Masukkan nama lengkap beserta gelar" required>
+                    {% for error in form.name.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_photo" class="form-label">Foto Paslon</label>
+                    <div class="file-upload" onclick="document.getElementById('id_photo').click()">
+                        <div class="file-upload__icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                        </div>
+                        <p class="file-upload__title">Pilih Foto Resmi Paslon</p>
+                        <p class="file-upload__hint">Format JPG/PNG, maks 5MB</p>
+                        <input type="file" name="photo" id="id_photo" accept="image/*" style="display:none;" onchange="updateFileLabel(this)">
+                    </div>
+                    <p class="form-error" id="photo-filename" style="color:var(--color-ink); margin-top:var(--spacing-xs);"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Visi & Misi -->
+        <div class="form-section" style="margin-bottom:var(--spacing-xl);">
+            <div class="form-section__header">
+                <span class="text-caption">02</span>
+                <h3 class="text-body-lg" style="font-weight:540;">Visi &amp; Misi</h3>
+            </div>
+            <div class="card">
+                <div class="form-group">
+                    <label for="id_visi" class="form-label">Visi <span style="color:var(--color-error);">*</span></label>
+                    <textarea name="visi" id="id_visi" rows="4"
+                              class="form-input {% if form.visi.errors %}is-invalid{% endif %}"
+                              placeholder="Tuliskan visi utama pasangan calon..." required>{{ form.visi.value|default:'' }}</textarea>
+                    {% for error in form.visi.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_misi" class="form-label">Misi <span style="color:var(--color-error);">*</span></label>
+                    <textarea name="misi" id="id_misi" rows="6"
+                              class="form-input {% if form.misi.errors %}is-invalid{% endif %}"
+                              placeholder="1. ...&#10;2. ...&#10;3. ..." required>{{ form.misi.value|default:'' }}</textarea>
+                    {% for error in form.misi.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Anggota Paslon -->
+        <div class="form-section" style="margin-bottom:var(--spacing-xl);">
+            <div class="form-section__header">
+                <span class="text-caption">03</span>
+                <h3 class="text-body-lg" style="font-weight:540;">Anggota Paslon</h3>
+            </div>
+            <div class="card">
+                <p class="text-body-sm" style="color:#888; margin-bottom:var(--spacing-md);">Tambahkan minimal 2 anggota inti paslon (maks 5).</p>
+
+                {{ member_formset.management_form }}
+                {% for member_form in member_formset %}
+                    {% for hidden in member_form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    <div class="member-row">
+                        <span class="text-caption" style="flex-shrink:0; padding-top:14px;">{{ forloop.counter }}</span>
+                        <div class="form-row" style="flex:1;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <input type="text" name="{{ member_form.name.html_name }}"
+                                       class="form-input"
+                                       placeholder="Nama anggota"
+                                       value="{{ member_form.name.value|default:'' }}">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <input type="text" name="{{ member_form.role.html_name }}"
+                                       class="form-input"
+                                       placeholder="Jabatan / Peran"
+                                       value="{{ member_form.role.value|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; justify-content:flex-end; gap:var(--spacing-sm); padding-top:var(--spacing-lg); border-top:1px solid var(--color-hairline);">
+            <a href="{% url 'candidates:list' %}" class="btn btn-secondary btn-sm">Batal</a>
+            <button type="submit" class="btn btn-primary btn-sm">Ajukan Verifikasi</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateFileLabel(input) {
+    var label = document.getElementById('photo-filename');
+    if (input.files && input.files[0]) {
+        label.textContent = input.files[0].name;
+    } else {
+        label.textContent = '';
+    }
+}
+</script>
+{% endblock %}

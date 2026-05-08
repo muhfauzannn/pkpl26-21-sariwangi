@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registrasi - E-Voting System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'authentication/css/auth.css' %}">
+{% endblock %}
+
+{% block auth_content %}
+<div class="auth-wrapper">
+    <div class="auth-card card card-elevated">
+        <p class="text-eyebrow mb-md">E-Voting System</p>
+        <h1 class="text-headline mb-xl">Registrasi</h1>
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-error">
+                    {{ error }}
+                    <button type="button" class="alert__close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" name="username" id="id_username"
+                       class="form-input {% if form.username.errors %}is-invalid{% endif %}"
+                       value="{{ form.username.value|default:'' }}" required>
+                {% for error in form.username.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_email" class="form-label">Email</label>
+                <input type="email" name="email" id="id_email"
+                       class="form-input {% if form.email.errors %}is-invalid{% endif %}"
+                       value="{{ form.email.value|default:'' }}" required>
+                {% for error in form.email.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_first_name" class="form-label">Nama Depan</label>
+                    <input type="text" name="first_name" id="id_first_name"
+                           class="form-input"
+                           value="{{ form.first_name.value|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="id_last_name" class="form-label">Nama Belakang</label>
+                    <input type="text" name="last_name" id="id_last_name"
+                           class="form-input"
+                           value="{{ form.last_name.value|default:'' }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1" class="form-label">Password</label>
+                <input type="password" name="password1" id="id_password1"
+                       class="form-input {% if form.password2.errors %}is-invalid{% endif %}"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2" class="form-label">Konfirmasi Password</label>
+                <input type="password" name="password2" id="id_password2"
+                       class="form-input {% if form.password2.errors %}is-invalid{% endif %}"
+                       required>
+                {% for error in form.password2.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_role" class="form-label">Daftar Sebagai</label>
+                <select name="role" id="id_role"
+                        class="form-select {% if form.role.errors %}is-invalid{% endif %}" required>
+                    {% for value, label in form.fields.role.choices %}
+                        <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% for error in form.role.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <!-- Pemilih-only fields -->
+            <div id="pemilih-fields" style="display:none; border-top:1px solid var(--color-hairline); padding-top:var(--spacing-lg); margin-top:var(--spacing-lg);">
+                <p class="text-eyebrow" style="margin-bottom:var(--spacing-md);">Data Pemilih</p>
+
+                <div class="form-group">
+                    <label for="id_nik" class="form-label">NIK <span style="color:var(--color-error);">*</span></label>
+                    <input type="text" name="nik" id="id_nik" maxlength="16"
+                           class="form-input {% if form.nik.errors %}is-invalid{% endif %}"
+                           value="{{ form.nik.value|default:'' }}" placeholder="16 digit NIK">
+                    {% for error in form.nik.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_npm" class="form-label">NPM <span style="color:var(--color-error);">*</span></label>
+                    <input type="text" name="npm" id="id_npm" maxlength="15"
+                           class="form-input {% if form.npm.errors %}is-invalid{% endif %}"
+                           value="{{ form.npm.value|default:'' }}" placeholder="NPM">
+                    {% for error in form.npm.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_faculty" class="form-label">Fakultas <span style="color:var(--color-error);">*</span></label>
+                        <input type="text" name="faculty" id="id_faculty"
+                               class="form-input {% if form.faculty.errors %}is-invalid{% endif %}"
+                               value="{{ form.faculty.value|default:'' }}" placeholder="Fakultas">
+                        {% for error in form.faculty.errors %}
+                            <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_study_program" class="form-label">Program Studi <span style="color:var(--color-error);">*</span></label>
+                        <input type="text" name="study_program" id="id_study_program"
+                               class="form-input {% if form.study_program.errors %}is-invalid{% endif %}"
+                               value="{{ form.study_program.value|default:'' }}" placeholder="Program studi">
+                        {% for error in form.study_program.errors %}
+                            <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Daftar</button>
+        </form>
+
+        <p class="text-center mt-lg text-body-sm">
+            Sudah punya akun? <a href="{% url 'authentication:login' %}">Login di sini</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('id_role').addEventListener('change', function() {
+    document.getElementById('pemilih-fields').style.display = this.value === 'pemilih' ? 'block' : 'none';
+});
+// Show on load if already selected
+if (document.getElementById('id_role').value === 'pemilih') {
+    document.getElementById('pemilih-fields').style.display = 'block';
+}
+</script>
+{% endblock %}

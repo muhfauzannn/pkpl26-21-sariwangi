@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Hapus Pemilih - E-Voting System{% endblock %}
+{% block page_title %}Hapus Pemilih{% endblock %}
+{% block nav_voters %}active{% endblock %}
+
+{% block content %}
+<div style="max-width:480px;">
+    <div class="card">
+        <p class="text-body" style="margin-bottom:var(--spacing-xl);">
+            Apakah Anda yakin ingin menghapus data pemilih <strong>{{ voter.full_name }}</strong> (NIK: {{ voter.nik }})?
+            Tindakan ini tidak dapat dibatalkan.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:flex; gap:var(--spacing-sm);">
+                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                <a href="{% url 'voters:list' %}" class="btn btn-secondary btn-sm">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

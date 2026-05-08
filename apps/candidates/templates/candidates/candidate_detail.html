@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{{ candidate.name }} - E-Voting System{% endblock %}
+{% block page_title %}Detail Paslon{% endblock %}
+{% block nav_candidates %}active{% endblock %}
+
+{% block content %}
+<div style="max-width:700px;">
+    <a href="{% url 'candidates:list' %}" class="text-body-sm" style="text-decoration:none; display:inline-block; margin-bottom:var(--spacing-lg);">&larr; Kembali ke daftar paslon</a>
+
+    <!-- Header -->
+    <div style="display:flex; align-items:center; gap:var(--spacing-lg); margin-bottom:var(--spacing-xl);">
+        {% if candidate.photo %}
+            <img src="{{ candidate.photo.url }}" alt="{{ candidate.name }}"
+                 style="width:80px; height:80px; object-fit:cover; border-radius:var(--rounded-md);">
+        {% else %}
+            <div style="width:80px; height:80px; background:var(--color-surface-soft); border-radius:var(--rounded-md); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:540;">
+                {{ candidate.name|first }}
+            </div>
+        {% endif %}
+        <div style="flex:1;">
+            {% if candidate.candidate_number %}<p class="text-caption" style="margin-bottom:var(--spacing-xxs);">Nomor {{ candidate.candidate_number }}</p>{% endif %}
+            <h2 class="text-headline">{{ candidate.name }}</h2>
+        </div>
+        <div>
+            {% if candidate.status == "pending" %}
+                <span class="badge badge-warning">Menunggu Verifikasi</span>
+            {% elif candidate.status == "approved" %}
+                <span class="badge badge-success">Disetujui</span>
+            {% else %}
+                <span class="badge badge-danger">Ditolak</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Visi -->
+    <div class="color-block color-block-cream" style="margin-bottom:var(--spacing-lg);">
+        <h3 class="text-body-lg" style="font-weight:540; margin-bottom:var(--spacing-sm);">Visi</h3>
+        <p class="text-body">{{ candidate.visi }}</p>
+    </div>
+
+    <!-- Misi -->
+    <div class="color-block color-block-lilac" style="margin-bottom:var(--spacing-lg);">
+        <h3 class="text-body-lg" style="font-weight:540; margin-bottom:var(--spacing-sm);">Misi</h3>
+        <p class="text-body">{{ candidate.misi }}</p>
+    </div>
+
+    <!-- Anggota -->
+    {% if candidate.members.exists %}
+    <div class="card" style="margin-bottom:var(--spacing-lg);">
+        <h3 class="text-body-lg" style="font-weight:540; margin-bottom:var(--spacing-md);">Anggota Paslon</h3>
+        {% for member in candidate.members.all %}
+        <div class="member-row" style="padding:var(--spacing-sm) 0; {% if not forloop.last %}border-bottom:1px solid var(--color-hairline-soft);{% endif %}">
+            {% if member.photo %}
+                <img src="{{ member.photo.url }}" alt="{{ member.name }}" style="width:36px; height:36px; object-fit:cover; border-radius:var(--rounded-full);">
+            {% else %}
+                <div style="width:36px; height:36px; background:var(--color-surface-soft); border-radius:var(--rounded-full); display:flex; align-items:center; justify-content:center; font-size:14px;">{{ member.name|first }}</div>
+            {% endif %}
+            <span class="text-body" style="flex:1;">{{ member.name }}</span>
+            <span class="text-body-sm" style="color:#888;">{{ member.role }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Supervisor Review Panel -->
+    {% if user.role == "pengawas" and candidate.status == "pending" %}
+    <div class="form-section" style="margin-top:var(--spacing-xl); padding-top:var(--spacing-xl); border-top:2px dashed var(--color-hairline);">
+        <div class="form-section__header" style="margin-bottom:var(--spacing-md);">
+            <span class="text-caption">Pengawas</span>
+            <h3 class="text-body-lg" style="font-weight:540;">Panel Verifikasi</h3>
+        </div>
+        <div class="card">
+            <p class="text-body-sm" style="color:#888; margin-bottom:var(--spacing-lg);">Periksa kembali data paslon sebelum melakukan verifikasi.</p>
+            <div style="display:flex; gap:var(--spacing-sm);">
+                <form method="post" action="{% url 'candidates:reject' candidate.pk %}" style="flex:1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm btn-full">Tolak Pengajuan</button>
+                </form>
+                <form method="post" action="{% url 'candidates:approve' candidate.pk %}" style="flex:1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm btn-full">Setujui Paslon</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

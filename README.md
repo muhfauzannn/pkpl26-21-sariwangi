@@ -260,59 +260,21 @@ cursor.execute("SELECT * FROM users WHERE username = %s", [username])
 
 
 ### 1.3 Screenshot Aplikasi
-
+---
 #### Authentication
-##### Login
+
+**Login**
 ![Login](screenshots/Login_-_E-Voting_System.png)
 
-##### Login Gagal - Akun Terkunci (5x Salah)
+**Login Gagal - Akun Terkunci (5x Salah)**
 ![Login Salah](screenshots/Login_Salah___5x_Akun_Locked.png)
 
-##### Registrasi
+**Registrasi**
 ![Registrasi](screenshots/Registrasi_-_E-Voting_System.png)
 
-#### Paslon
-##### Daftar Paslon
-![Daftar Paslon](screenshots/Daftar_Paslon_-_E-Voting_System.png)
+---
 
-##### Paslon 1 - Harapan Bangsa
-![Paslon Harapan Bangsa](screenshots/Paslon_Harapan_Bangsa_-_E-Voting_System.png)
-
-##### Paslon 2 - Maju Bersama
-![Paslon Maju Bersama](screenshots/Paslon_Maju_Bersama_-_E-Voting_System.png)
-
-##### Paslon 3 - Untuk Rakyat
-![Paslon Untuk Rakyat](screenshots/Paslon_Untuk_Rakyat_-_E-Voting_System.png)
-
-#### Voting
-##### Surat Suara
-![Surat Suara](screenshots/Surat_Suara_-_E-Voting_System.png)
-
-##### Pilih Paslon 1
-![Pilih 1](screenshots/Surat_Suara_-_E-Voting_System__pilih_1_.png)
-
-##### Pilih Paslon 2
-![Pilih 2](screenshots/Surat_Suara_-_E-Voting_System__pilih_2_.png)
-
-##### Pilih Paslon 3
-![Pilih 3](screenshots/Surat_Suara_-_E-Voting_System__pilih_3_.png)
-
-##### Konfirmasi Pilihan
-![Konfirmasi](screenshots/Surat_Suara_-_E-Voting_System__pilih_paslon_.png)
-
-##### Voting Berhasil
-![Voting Berhasil](screenshots/Voting_Berhasil_-_E-Voting_System.png)
-
-#### Hasil Voting
-##### Lihat Hasil
-![Hasil Voting](screenshots/Hasil_Voting_-_E-Voting_System__lihat_hasil_.png)
-
-#### Security
-##### Password Ter-hash di Database
-![Password Hash](screenshots/Password_ter-hash_di_Database.png)
-Bagian securtiy lainnya akan kami demokan divideo.
-
-#### Pengawas
+#### View sebagai Pengawas
 
 **Login Berhasil**
 ![Login Berhasil](screenshots/pengawas_login_success.png)
@@ -353,18 +315,68 @@ Bagian securtiy lainnya akan kami demokan divideo.
 **Audit Log**
 ![Audit Log](screenshots/pengawas_audit_log.png)
 
-#### Paslon
-##### Registrasi Paslon
+---
+
+#### View sebagai Paslon
+
+**Registrasi Paslon**
 ![Registrasi Paslon](screenshots/Registrasi_Paslon_-_E-Voting_System.png)
 
-##### Daftar Paslon - Menunggu Verifikasi
+**Daftar Paslon - Menunggu Verifikasi**
 ![Daftar Paslon Menunggu](screenshots/Daftar_Paslon_Menunggu_-_E-Voting_System.png)
 
-##### Daftar Paslon - Disetujui
+**Daftar Paslon - Disetujui**
 ![Daftar Paslon Disetujui](screenshots/Daftar_Paslon_Disetujui_-_E-Voting_System.png)
 
-##### Rekapitulasi Hasil Suara
+**Rekapitulasi Hasil Suara**
 ![Rekapitulasi Hasil](screenshots/Rekapitulasi_Hasil_-_E-Voting_System.png)
+
+---
+
+#### View sebagai Pemilih
+
+**Daftar Paslon**
+![Daftar Paslon](screenshots/Daftar_Paslon_-_E-Voting_System.png)
+
+**Paslon 1 - Harapan Bangsa**
+![Paslon Harapan Bangsa](screenshots/Paslon_Harapan_Bangsa_-_E-Voting_System.png)
+
+**Paslon 2 - Maju Bersama**
+![Paslon Maju Bersama](screenshots/Paslon_Maju_Bersama_-_E-Voting_System.png)
+
+**Paslon 3 - Untuk Rakyat**
+![Paslon Untuk Rakyat](screenshots/Paslon_Untuk_Rakyat_-_E-Voting_System.png)
+
+**Surat Suara**
+![Surat Suara](screenshots/Surat_Suara_-_E-Voting_System.png)
+
+**Pilih Paslon 1**
+![Pilih 1](screenshots/Surat_Suara_-_E-Voting_System__pilih_1_.png)
+
+**Pilih Paslon 2**
+![Pilih 2](screenshots/Surat_Suara_-_E-Voting_System__pilih_2_.png)
+
+**Pilih Paslon 3**
+![Pilih 3](screenshots/Surat_Suara_-_E-Voting_System__pilih_3_.png)
+
+**Konfirmasi Pilihan**
+![Konfirmasi](screenshots/Surat_Suara_-_E-Voting_System__pilih_paslon_.png)
+
+**Voting Berhasil**
+![Voting Berhasil](screenshots/Voting_Berhasil_-_E-Voting_System.png)
+
+**Hasil Voting**
+![Hasil Voting](screenshots/Hasil_Voting_-_E-Voting_System__lihat_hasil_.png)
+
+---
+
+#### Security
+
+**Password Ter-hash di Database**
+![Password Hash](screenshots/Password_ter-hash_di_Database.png)
+
+Bagian security lainnya akan kami demokan di video.
+
 ---
 
 ### 1.4 Hasil Test-Case

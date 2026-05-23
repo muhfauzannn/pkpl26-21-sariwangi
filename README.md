@@ -575,3 +575,193 @@ PKPL26_21_sariwangi/
 1. Demo aplikasi secara fungsional (maks. 2 menit)
 2. Demonstrasi pengujian berdasarkan test case dan hasilnya
 3. Penjelasan teknik mitigasi yang dipilih beserta alasannya
+
+---
+
+# Tugas 4 — Unit Testing, Pentesting
+
+**Tugas 4 — Security Testing**
+Pengantar Keamanan Perangkat Lunak — Genap 2025/2026
+
+---
+
+## 4. Laporan Unit Testing
+
+### 4.1 Pendahuluan
+
+Laporan ini mendokumentasikan unit testing yang dilakukan terhadap aplikasi E-Voting System. Pengujian difokuskan pada empat area keamanan utama:
+
+1. **Code Injection Prevention**
+2. **Broken Authentication Mitigation**
+3. **CSRF Protection**
+4. **SQL Injection Prevention**
+
+### 4.2 Metodologi
+
+| Komponen | Detail |
+| -------- | ------ |
+| Testing Framework | Django TestCase (`django.test.TestCase`) |
+| HTTP Client | Django Test Client (`django.test.Client`) |
+| Request Simulation | Django `RequestFactory` |
+| Coverage Tool | `coverage.py` v7.13.5 |
+| Test Runner | `python manage.py test` |
+| Lingkungan | `config.settings.development` (SQLite in-memory) |
+
+Pengujian dilakukan menggunakan pendekatan **black-box testing** pada level view dan **white-box testing** pada level form/service. Setiap test case bersifat independen — database direset untuk setiap test menggunakan transaksi yang di-rollback otomatis oleh Django TestCase.
+
+Cara menjalankan:
+
+```bash
+source .venv/bin/activate
+
+# Jalankan semua test
+python manage.py test --settings=config.settings.development -v 2
+
+# Jalankan dengan coverage
+coverage run manage.py test --settings=config.settings.development
+coverage report -m
+```
+
+### 4.3 Hasil Ringkasan
+
+| Area Keamanan | Jumlah Test | Status |
+| ------------- | :---------: | :----: |
+| Code Injection Prevention | 11 | ✅ PASS |
+| Broken Authentication Mitigation | 14 | ✅ PASS |
+| CSRF Protection | 4 | ✅ PASS |
+| SQL Injection Prevention | 5 | ✅ PASS |
+| **Total** | **46** | **✅ PASS** |
+
+> Catatan: Beberapa test case mencakup lebih dari satu kategori keamanan.
+
+### 4.4 Detail Test per Kategori
+
+#### A. Code Injection Prevention (CWE-94, CWE-20, CWE-79)
+
+**Vulnerability yang ditarget:** Input pengguna tidak divalidasi sehingga memungkinkan eksekusi kode berbahaya atau XSS.
+
+**Teknik mitigasi yang diuji:** validasi input via Django Forms (regex, length, whitelist), HTML auto-escaping pada template, strip whitespace.
+
+| No | Test Case | Method | Deskripsi | Expected Result | Status |
+|----|-----------|--------|-----------|-----------------|--------|
+| CI-01 | Registrasi dengan role tidak valid | `test_registration_rejects_pengawas_role_from_public_form` | Form registrasi tidak menerima role `pengawas` dari input publik | Form invalid, error pada `role` | ✅ PASS |
+| CI-02 | Validasi format NIK (16 digit angka) | `test_voter_form_rejects_invalid_nik_and_npm` | NIK kurang dari 16 digit / bukan angka ditolak regex validator | Form invalid, error pada `nik` | ✅ PASS |
+| CI-03 | Validasi format NPM (digit saja) | `test_voter_form_rejects_invalid_nik_and_npm` | NPM mengandung huruf ditolak | Form invalid, error pada `npm` | ✅ PASS |
+| CI-04 | Strip whitespace pada input teks | `test_candidate_forms_strip_valid_text` | Input dengan spasi di awal/akhir di-strip sebelum disimpan | `cleaned_data` tanpa leading/trailing whitespace | ✅ PASS |
+| CI-05 | Validasi panjang minimum visi-misi | `test_candidate_form_rejects_short_visi_and_misi` | Visi/misi kurang dari 10 karakter ditolak | Form invalid, error pada `visi` dan `misi` | ✅ PASS |
+| CI-06 | Template escaping karakter berbahaya (XSS) | `test_template_escapes_dangerous_voter_input` | Input `<script>alert(1)</script>` di-escape oleh Django template | Response mengandung `&lt;script&gt;`, tidak ada tag `<script>` literal | ✅ PASS |
+| CI-07 | Duplikasi username case-insensitive | `test_registration_rejects_duplicate_identity_fields` | Username sama (beda kapitalisasi) ditolak | Form invalid, error pada `username` | ✅ PASS |
+| CI-08 | Duplikasi email case-insensitive | `test_registration_rejects_duplicate_identity_fields` | Email sama (beda kapitalisasi) ditolak | Form invalid, error pada `email` | ✅ PASS |
+| CI-09 | Duplikasi NIK & NPM saat registrasi | `test_registration_rejects_duplicate_identity_fields` | NIK dan NPM yang sudah terdaftar ditolak | Form invalid, error pada `nik` dan `npm` | ✅ PASS |
+| CI-10 | Duplikasi email pemilih (voter form) | `test_voter_form_rejects_duplicate_email_case_insensitive` | Email sudah digunakan pemilih lain ditolak | Form invalid, error pada `email` | ✅ PASS |
+| CI-11 | Password mismatch & format NIK/NPM invalid | `test_registration_rejects_password_mismatch_and_invalid_voter_numbers` | Kombinasi password mismatch + NIK/NPM tidak valid ditolak | Form invalid, error pada `password2`, `nik`, `npm` | ✅ PASS |
+
+#### B. Broken Authentication Mitigation (CWE-307, CWE-256, CWE-613, CWE-287)
+
+**Vulnerability yang ditarget:** Brute-force login, password disimpan plaintext, session tidak aman, privilege escalation.
+
+**Teknik mitigasi yang diuji:** PBKDF2 password hashing, rate limiting (lockout 5× gagal/15 menit), session security, RBAC, pencatatan `LoginAttempt`.
+
+| No | Test Case | Method | Deskripsi | Expected Result | Status |
+|----|-----------|--------|-----------|-----------------|--------|
+| BA-01 | Password disimpan sebagai hash PBKDF2 | `test_create_user_stores_hashed_password` | Password tidak pernah disimpan plaintext | `user.password` diawali `pbkdf2_`, bukan plaintext | ✅ PASS |
+| BA-02 | Password lemah ditolak saat registrasi | `test_registration_uses_django_password_validators` | Password sederhana (`password`) ditolak validator | Form invalid, error pada `password2` | ✅ PASS |
+| BA-03 | Rate limiting: lockout setelah 5× gagal | `test_login_rate_limit_locks_unknown_username_after_five_failures` | Percobaan login ke-6 dari IP yang sama diblokir | Pesan "Akun sementara dikunci", hanya 5 `LoginAttempt` tercatat | ✅ PASS |
+| BA-04 | Akun nonaktif tidak dapat login | `test_inactive_login_attempt_returns_disabled_error_when_backend_returns_user` | User `is_active=False` ditolak meski password benar | Return `None, "Akun dinonaktifkan"` | ✅ PASS |
+| BA-05 | User terautentikasi di-redirect dari halaman auth | `test_authenticated_users_are_redirected_away_from_auth_pages` | User yang sudah login tidak bisa akses `/auth/login/` | Redirect ke halaman sesuai role | ✅ PASS |
+| BA-06 | IP forwarding dari proxy terdeteksi | `test_get_client_ip_uses_forwarded_for` | `X-Forwarded-For` header dibaca dengan benar | IP pertama dari header digunakan | ✅ PASS |
+| BA-07 | Non-pengawas tidak bisa akses manajemen pemilih | `test_non_pengawas_cannot_access_voter_management` | Pemilih mengakses `/voters/` mendapat 403 | Response status 403 | ✅ PASS |
+| BA-08 | Pemilih tidak bisa mendaftar sebagai paslon | `test_pemilih_cannot_register_as_candidate` | Pemilih mengakses `/candidates/register/` mendapat 403 | Response status 403 | ✅ PASS |
+| BA-09 | Non-pengawas tidak bisa approve/reject paslon | `test_non_pengawas_cannot_approve_or_reject_candidate` | Pemilih coba approve/reject mendapat 403 | Response status 403 | ✅ PASS |
+| BA-10 | Paslon tidak bisa mendaftar dua kali | `test_paslon_cannot_register_twice` | Paslon yang sudah terdaftar di-redirect | Redirect ke daftar paslon | ✅ PASS |
+| BA-11 | Non-pemilih tidak bisa akses halaman voting | `test_paslon_cannot_access_vote_page` | Paslon coba akses `/voting/` di-redirect | Redirect ke `/` | ✅ PASS |
+| BA-12 | Pemilih tanpa profil voter tidak bisa voting | `test_pemilih_without_voter_profile_cannot_vote` | Role pemilih tanpa data `Voter` ditolak | Redirect ke hasil voting | ✅ PASS |
+| BA-13 | Pemilih nonaktif tidak bisa voting | `test_inactive_voter_cannot_vote` | Voter dengan status `INACTIVE` ditolak | Redirect ke hasil voting | ✅ PASS |
+| BA-14 | Audit log mencatat login & logout | `test_login_action_is_written_to_audit_log`, `test_logout_action_is_written_to_audit_log` | Setiap login dan logout tersimpan ke `AuditLog` | Record dengan `action=LOGIN/LOGOUT` ada di DB | ✅ PASS |
+
+#### C. CSRF Protection (CWE-352)
+
+**Vulnerability yang ditarget:** Attacker memalsukan request dari sesi user yang sudah aktif.
+
+**Teknik mitigasi yang diuji:** `CsrfViewMiddleware` aktif global, `{% csrf_token %}` pada semua form write, logout hanya via POST, cookie `SameSite=Lax`.
+
+| No | Test Case | Method | Deskripsi | Expected Result | Status |
+|----|-----------|--------|-----------|-----------------|--------|
+| CSRF-01 | Logout tanpa CSRF token ditolak | `test_logout_without_csrf_token_is_rejected` | POST `/auth/logout/` tanpa token (`enforce_csrf_checks=True`) | Response 403 Forbidden | ✅ PASS |
+| CSRF-02 | Vote tanpa CSRF token ditolak | `test_vote_without_csrf_token_is_rejected` | POST `/voting/vote/` tanpa token | Response 403 Forbidden, `Vote.objects.count()` tetap 0 | ✅ PASS |
+| CSRF-03 | Approve/reject paslon tanpa CSRF token | `test_non_pengawas_cannot_approve_or_reject_candidate` | POST approve/reject oleh non-pengawas ditolak | Response 403 Forbidden | ✅ PASS |
+| CSRF-04 | Vote berhasil dengan CSRF token valid | `test_pemilih_can_vote_once_only` | Vote dengan CSRF token valid berhasil disimpan | Redirect ke success, `Vote` tersimpan di DB | ✅ PASS |
+
+#### D. SQL Injection Prevention (CWE-89)
+
+**Vulnerability yang ditarget:** Input tidak tersanitasi memanipulasi query database.
+
+**Teknik mitigasi yang diuji:** seluruh operasi DB via Django ORM (parameterized query otomatis), form validation menolak format tidak valid, tidak ada raw SQL dengan string concatenation, `UniqueConstraint` sebagai defense-in-depth.
+
+| No | Test Case | Method | Deskripsi | Expected Result | Status |
+|----|-----------|--------|-----------|-----------------|--------|
+| SQLi-01 | Validasi NIK menolak input non-angka | `test_voter_form_rejects_invalid_nik_and_npm` | Karakter SQL seperti `'`, `-` pada NIK ditolak regex validator | Form invalid, error pada `nik` | ✅ PASS |
+| SQLi-02 | ORM melindungi query filter case-insensitive | `test_registration_rejects_duplicate_identity_fields` | `username__iexact` menggunakan parameterized LIKE — tidak bisa diinjeksi | Form invalid dengan pesan duplikasi yang benar | ✅ PASS |
+| SQLi-03 | Query login menggunakan ORM authenticate | `test_login_rate_limit_locks_unknown_username_after_five_failures` | Login dengan username apapun tidak menyebabkan error SQL | Response normal, tidak ada unhandled exception | ✅ PASS |
+| SQLi-04 | UniqueConstraint sebagai defense-in-depth | `test_pemilih_can_vote_once_only` | Constraint DB mencegah double vote meski application-layer check dibypass | `Vote.objects.count()` tetap 1 setelah dua percobaan | ✅ PASS |
+| SQLi-05 | IntegrityError ditangani dengan aman | `test_integrity_error_during_vote_redirects_to_results` | `IntegrityError` dari DB di-catch — tidak ada stack trace yang terekspos | Redirect ke results, tidak ada 500 error | ✅ PASS |
+
+### 4.5 Coverage Report
+
+```
+Name                                Stmts   Miss  Cover
+-------------------------------------------------------
+apps/authentication/forms.py           68      0   100%
+apps/authentication/middleware.py      25      0   100%
+apps/authentication/models.py          19      0   100%
+apps/authentication/services.py        36      0   100%
+apps/authentication/views.py           51      0   100%
+apps/candidates/forms.py               30      0   100%
+apps/candidates/models.py              26      0   100%
+apps/candidates/views.py               92      0   100%
+apps/dashboard/models.py               21      0   100%
+apps/dashboard/services.py              8      0   100%
+apps/dashboard/views.py                29      0   100%
+apps/voters/forms.py                   33      0   100%
+apps/voters/models.py                  19      0   100%
+apps/voters/views.py                   46      0   100%
+apps/voting/forms.py                    4      0   100%
+apps/voting/models.py                   9      0   100%
+apps/voting/views.py                   54      0   100%
+-------------------------------------------------------
+TOTAL                                 654      0   100%
+```
+
+### 4.6 Screenshot Hasil Pengujian
+
+**Semua 46 test PASS:**
+![Test Output ](screenshots/SS1.png)
+
+**Coverage Report 100%:**
+![Coverage Report](screenshots/SS2.png)
+
+
+### 4.7 Kesimpulan Unit Testing
+
+Seluruh 46 unit test berhasil dijalankan dengan hasil **PASS** dan **coverage 100%**. Keempat area keamanan yang disyaratkan telah diuji:
+
+- **Code Injection Prevention**: Django Forms memvalidasi dan mensanitasi semua input. Template engine meng-escape karakter berbahaya sehingga XSS tidak dapat dieksekusi.
+- **Broken Authentication Mitigation**: Password disimpan dengan PBKDF2 hash. Rate limiting membatasi 5 percobaan login per 15 menit. RBAC memastikan setiap role hanya mengakses fungsi yang sesuai haknya.
+- **CSRF Protection**: `CsrfViewMiddleware` aktif global. Semua endpoint write memverifikasi CSRF token dan mengembalikan 403 jika token tidak ada atau tidak valid.
+- **SQL Injection Prevention**: Django ORM menggunakan parameterized query untuk semua operasi database. Tidak ada raw SQL dengan string concatenation. Validasi form menolak input berformat tidak valid sebelum query dieksekusi.
+
+---
+
+## 5. Laporan Pentesting
+
+> *(Akan diisi setelah pengujian pentesting selesai dilakukan)*
+
+---
+
+## 6. Video Demo Tugas 4
+
+**Video URL:** *(Tambahkan link YouTube setelah upload)*
+
+**Konten Video:**
+1. Prosedur dan hasil Unit Testing
+2. Prosedur dan hasil Pentesting (Reconnaissance, Scanning, Exploitation, Remediation)

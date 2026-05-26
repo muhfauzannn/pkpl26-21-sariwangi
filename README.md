@@ -819,15 +819,21 @@ Perintah yang digunakan:
 nmap -sV 127.0.0.1
 ```
 
+**Gambar 5.1 - Hasil Scan nmap**
+
 <img width="2048" height="1324" alt="unnamed (5)" src="https://github.com/user-attachments/assets/9e20ba13-62a2-43a2-8d0c-821b4cc6fd8b" />
-Hasil scan nmap pada host `127.0.0.1`.
+
+_Hasil scan nmap pada host `127.0.0.1`._
 
 Hasil scan menunjukkan aplikasi SariWangi berjalan pada port `8000` menggunakan `WSGIServer 0.2 (Python 3.9.6)`. Port lain yang terdeteksi (`5000`, `5432`, `7000`) merupakan layanan sistem lokal yang tidak berkaitan dengan aplikasi.
 
 #### 5.4.2 OWASP ZAP
 
+**Gambar 5.2 - Hasil Automated Scan OWASP ZAP**
+
 <img width="2048" height="1345" alt="unnamed (6)" src="https://github.com/user-attachments/assets/8a7b3239-95d0-498d-b75c-26ecfa189e00" />
-Hasil automated scan OWASP ZAP.
+
+_Hasil automated scan OWASP ZAP._
 
 OWASP ZAP berhasil melakukan automated scan terhadap aplikasi di `http://127.0.0.1:8000` dan mendeteksi **8 alerts** yang akan dibahas lebih lanjut pada tahap Scanning & Enumeration.
 
@@ -879,29 +885,53 @@ Berikut adalah 8 alerts yang ditemukan oleh OWASP ZAP:
 | 7 | User Agent Fuzzer | Informational |
 | 8 | User Controllable HTML Element Attribute (Potential XSS) | Informational |
 
+**Gambar 5.3 - Alert Content Security Policy**
+
 <img width="2048" height="1330" alt="unnamed (7)" src="https://github.com/user-attachments/assets/bd0ff69a-13bd-4ccf-9bb2-a9937de7203f" />
-Alert Content Security Policy (CSP) Header Not Set.
+
+_Alert Content Security Policy (CSP) Header Not Set._
+
+**Gambar 5.4 - Alert Sub Resource Integrity**
 
 <img width="2048" height="1330" alt="unnamed (8)" src="https://github.com/user-attachments/assets/49d368cd-7b14-414c-9050-843362a6335b" />
-Alert Sub Resource Integrity Attribute Missing.
+
+_Alert Sub Resource Integrity Attribute Missing._
+
+**Gambar 5.5 - Alert Server Leaks Version Information**
 
 <img width="2048" height="1330" alt="unnamed (9)" src="https://github.com/user-attachments/assets/4ae5f9e4-2af4-4202-a874-fcea0d693a91" />
-Alert Server Leaks Version Information.
+
+_Alert Server Leaks Version Information._
+
+**Gambar 5.6 - Alert X-Content-Type-Options**
 
 <img width="2048" height="1330" alt="unnamed (10)" src="https://github.com/user-attachments/assets/e1d8a3e9-e738-41c1-8566-c22ff4f7c21e" />
-Alert X-Content-Type-Options Header Missing.
+
+_Alert X-Content-Type-Options Header Missing._
+
+**Gambar 5.7 - Alert Authentication Request**
 
 <img width="2048" height="1330" alt="unnamed (11)" src="https://github.com/user-attachments/assets/e90ee950-a8c6-4c2d-9979-03b474e2ee81" />
-Alert Authentication Request Identified.
+
+_Alert Authentication Request Identified._
+
+**Gambar 5.8 - Alert Session Management Response**
 
 <img width="2048" height="1330" alt="unnamed (12)" src="https://github.com/user-attachments/assets/151390ca-580b-4bf5-9db0-b6c24b7791e1" />
-Alert Session Management Response Identified.
+
+_Alert Session Management Response Identified._
+
+**Gambar 5.9 - Alert User Agent Fuzzer**
 
 <img width="2048" height="1330" alt="unnamed (13)" src="https://github.com/user-attachments/assets/25ecf15f-1b0a-44ca-bfda-1507a853c6df" />
-Alert User Agent Fuzzer.
+
+_Alert User Agent Fuzzer._
+
+**Gambar 5.10 - Alert User Controllable HTML Element Attribute**
 
 <img width="2048" height="1330" alt="unnamed (14)" src="https://github.com/user-attachments/assets/4a58dd15-dfe5-46d1-b1f9-5216d7a27d2c" />
-Alert User Controllable HTML Element Attribute.
+
+_Alert User Controllable HTML Element Attribute._
 
 #### 5.6.2 Hasil Manual Testing
 
@@ -912,20 +942,35 @@ Alert User Controllable HTML Element Attribute.
 | 3 | Brute Force | Password salah 6x | `/auth/login/` | Akun dikunci selama 15 menit |
 | 4 | CSRF | POST tanpa CSRF token | `/auth/logout/` | Ditolak dengan response 403 Forbidden saat user sudah login; request `curl` tanpa login mendapat 302 redirect ke halaman login |
 
+**Gambar 5.11 - SQL Injection Attempt**
+
 <img width="2048" height="1330" alt="unnamed (15)" src="https://github.com/user-attachments/assets/1feac09b-c9f8-4377-a349-e7b637089aae" />
-SQL Injection attempt diblokir pada form login.
+
+_SQL Injection attempt diblokir pada form login._
+
+**Gambar 5.12 - XSS Attempt**
 
 <img width="2048" height="1330" alt="unnamed (16)" src="https://github.com/user-attachments/assets/4ec7947b-7e94-48ed-b20a-2708ac2b6dd0" />
-XSS attempt diblokir pada form login.
+
+_XSS attempt diblokir pada form login._
+
+**Gambar 5.13 - Login Gagal**
 
 <img width="2048" height="1330" alt="unnamed (17)" src="https://github.com/user-attachments/assets/e6ba88d6-e944-4002-ad7a-31d6a9f8ecc2" />
-Percobaan login gagal dengan pesan "Username atau password salah".
+
+_Percobaan login gagal dengan pesan "Username atau password salah"._
+
+**Gambar 5.14 - Account Lockout**
 
 <img width="2048" height="1330" alt="unnamed (18)" src="https://github.com/user-attachments/assets/76841b55-78dd-4bd0-aeb2-97112ee07b41" />
-Akun dikunci setelah 5 kali percobaan login gagal.
+
+_Akun dikunci setelah 5 kali percobaan login gagal._
+
+**Gambar 5.15 - CSRF Test via curl**
 
 <img width="1528" height="628" alt="unnamed (19)" src="https://github.com/user-attachments/assets/bc202003-6fe3-41b8-9b94-af5cdcfd5419" />
-CSRF test via curl, response 302 Found.
+
+_CSRF test via curl, response 302 Found._
 
 ---
 

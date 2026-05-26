@@ -578,7 +578,7 @@ PKPL26_21_sariwangi/
 
 ---
 
-# Tugas 4 — Unit Testing, Pentesting
+# Tugas 4 — Unit Testing, Pentesting, dan User Acceptance Testing
 
 **Tugas 4 — Security Testing**
 Pengantar Keamanan Perangkat Lunak — Genap 2025/2026
@@ -752,9 +752,245 @@ Seluruh 46 unit test berhasil dijalankan dengan hasil **PASS** dan **coverage 10
 
 ---
 
-## 5. Laporan Pentesting
+## 5. Laporan Penetration Testing
 
-> *(Akan diisi setelah pengujian pentesting selesai dilakukan)*
+**Penetration Testing Report**  
+**E-Voting System**  
+**Kelompok 21 (SariWangi)**  
+Pengantar Keamanan Perangkat Lunak - Genap 2025/2026
+
+---
+
+### 5.1 Introduction
+
+Laporan ini mendokumentasikan hasil penetration testing yang dilakukan terhadap aplikasi **E-Voting System SariWangi**, sebuah sistem pemungutan suara berbasis web yang dikembangkan sebagai bagian dari Tugas 3 mata kuliah Pengantar Keamanan Perangkat Lunak.
+
+Pengujian dilakukan secara internal oleh kelompok pengembang dengan tujuan mengidentifikasi kerentanan keamanan pada aplikasi sebelum deployment.
+
+### 5.2 Objective
+
+Tujuan dari penetration testing ini adalah:
+
+1. Mengidentifikasi kerentanan keamanan yang ada pada aplikasi E-Voting System SariWangi.
+2. Memverifikasi efektivitas implementasi secure coding yang telah dilakukan pada Tugas 3.
+3. Memberikan rekomendasi perbaikan terhadap kerentanan yang ditemukan.
+4. Memastikan aplikasi terlindungi dari empat jenis serangan utama: **Code Injection**, **Broken Authentication**, **CSRF**, dan **SQL Injection**.
+
+### 5.3 Scope
+
+| Parameter | Detail |
+| --- | --- |
+| Nama Aplikasi | E-Voting System SariWangi |
+| URL | `http://127.0.0.1:8000` |
+| Framework | Django (Python) |
+| Database | SQLite |
+
+#### 5.3.1 Assessment Attributes
+
+| Parameter | Value |
+| --- | --- |
+| Starting Vector | Internal (localhost) |
+| Target Criticality | High |
+| Assessment Nature | Cautious & Calculated |
+| Assessment Conspicuity | Clear |
+| Proof of Concept | Screenshot terlampir |
+
+#### 5.3.2 Risk Classification
+
+| Level | Deskripsi |
+| --- | --- |
+| Critical | Kerentanan yang dapat dieksploitasi secara publik |
+| High | Kerentanan yang dapat dieksploitasi namun memerlukan kondisi tertentu |
+| Medium | Kerentanan dengan dampak terbatas |
+| Low | Kerentanan dengan risiko minimal |
+| Info | Informasi yang tidak menimbulkan ancaman langsung |
+
+---
+
+### 5.4 Passive & Active Reconnaissance
+
+Pada tahap ini dilakukan pengumpulan informasi terhadap aplikasi menggunakan tools **nmap** dan **OWASP ZAP**.
+
+#### 5.4.1 nmap
+
+Perintah yang digunakan:
+
+```bash
+nmap -sV 127.0.0.1
+```
+
+> **Placeholder Gambar 1:** Hasil scan nmap pada host `127.0.0.1`.
+
+Hasil scan menunjukkan aplikasi SariWangi berjalan pada port `8000` menggunakan `WSGIServer 0.2 (Python 3.9.6)`. Port lain yang terdeteksi (`5000`, `5432`, `7000`) merupakan layanan sistem lokal yang tidak berkaitan dengan aplikasi.
+
+#### 5.4.2 OWASP ZAP
+
+> **Placeholder Gambar 2:** Hasil automated scan OWASP ZAP.
+
+OWASP ZAP berhasil melakukan automated scan terhadap aplikasi di `http://127.0.0.1:8000` dan mendeteksi **8 alerts** yang akan dibahas lebih lanjut pada tahap Scanning & Enumeration.
+
+---
+
+### 5.5 Threat Modeling
+
+Pada tahap ini diidentifikasi aset dan kemungkinan target serangan pada aplikasi E-Voting System SariWangi.
+
+#### 5.5.1 Aset yang Dilindungi
+
+| Aset | Deskripsi |
+| --- | --- |
+| Data pemilih | NIK, NPM, email, dan identitas pemilih |
+| Data paslon | Informasi kandidat dan hasil verifikasi |
+| Data voting | Pilihan suara dan rekapitulasi hasil |
+| Session pengguna | Token autentikasi dan cookie session |
+| Kredensial pengguna | Username dan password yang tersimpan |
+
+#### 5.5.2 Identifikasi Ancaman (STRIDE)
+
+| Ancaman | Deskripsi | Target |
+| --- | --- | --- |
+| Spoofing | Menyamar sebagai pengguna lain | Form login |
+| Tampering | Memanipulasi data voting | Endpoint submit vote |
+| Repudiation | Menyangkal telah melakukan voting | Audit log |
+| Information Disclosure | Membocorkan data pemilih | Database |
+| Denial of Service | Membanjiri request login | Endpoint login |
+| Elevation of Privilege | Mengakses fitur pengawas sebagai pemilih | RBAC middleware |
+
+---
+
+### 5.6 Scanning & Enumeration
+
+Pada tahap ini dilakukan deteksi kerentanan secara otomatis menggunakan OWASP ZAP dan secara manual menggunakan browser.
+
+#### 5.6.1 Hasil Automated Scan (OWASP ZAP)
+
+Berikut adalah 8 alerts yang ditemukan oleh OWASP ZAP:
+
+| No | Alert | Risk Level |
+| --- | --- | --- |
+| 1 | Content Security Policy (CSP) Header Not Set | Medium |
+| 2 | Sub Resource Integrity Attribute Missing | Medium |
+| 3 | Server Leaks Version Information via `Server` HTTP Response Header | Low |
+| 4 | X-Content-Type-Options Header Missing | Low |
+| 5 | Authentication Request Identified | Informational |
+| 6 | Session Management Response Identified | Informational |
+| 7 | User Agent Fuzzer | Informational |
+| 8 | User Controllable HTML Element Attribute (Potential XSS) | Informational |
+
+> **Placeholder Gambar 3:** Alert Content Security Policy (CSP) Header Not Set.
+
+> **Placeholder Gambar 4:** Alert Sub Resource Integrity Attribute Missing.
+
+> **Placeholder Gambar 5:** Alert Server Leaks Version Information.
+
+> **Placeholder Gambar 6:** Alert X-Content-Type-Options Header Missing.
+
+> **Placeholder Gambar 7:** Alert Authentication Request Identified.
+
+> **Placeholder Gambar 8:** Alert Session Management Response Identified.
+
+> **Placeholder Gambar 9:** Alert User Agent Fuzzer.
+
+> **Placeholder Gambar 10:** Alert User Controllable HTML Element Attribute.
+
+#### 5.6.2 Hasil Manual Testing
+
+| No | Serangan | Payload | URL | Hasil |
+| --- | --- | --- | --- | --- |
+| 1 | SQL Injection | `' OR 1=1--` | `/auth/login/` | Diblokir oleh validasi input Django Form |
+| 2 | XSS | `<script>alert(1)</script>` | `/auth/login/` | Diblokir oleh validasi input Django Form |
+| 3 | Brute Force | Password salah 6x | `/auth/login/` | Akun dikunci selama 15 menit |
+| 4 | CSRF | POST tanpa CSRF token | `/auth/logout/` | Ditolak dengan response 403 Forbidden saat user sudah login; request `curl` tanpa login mendapat 302 redirect ke halaman login |
+
+> **Placeholder Gambar 11:** SQL Injection attempt diblokir pada form login.
+
+> **Placeholder Gambar 12:** XSS attempt diblokir pada form login.
+
+> **Placeholder Gambar 13a:** Percobaan login gagal dengan pesan "Username atau password salah".
+
+> **Placeholder Gambar 13b:** Akun dikunci setelah 5 kali percobaan login gagal.
+
+> **Placeholder Gambar 14:** CSRF test via curl, response 302 Found.
+
+---
+
+### 5.7 Exploitation & Testing
+
+Pada tahap ini dilakukan percobaan eksploitasi terhadap target yang telah diidentifikasi pada tahap Threat Modeling menggunakan kerentanan yang ditemukan pada tahap Scanning & Enumeration.
+
+#### 5.7.1 SQL Injection
+
+| Parameter | Detail |
+| --- | --- |
+| Target | Form login pada `/auth/login/` |
+| Payload | `' OR 1=1--` |
+| Status | Gagal dieksploitasi |
+
+Eksploitasi dilakukan untuk mencoba bypass autentikasi. Serangan gagal karena Django Form memvalidasi input sebelum diproses dan Django ORM menggunakan parameterized queries secara otomatis sehingga payload tidak dapat memanipulasi query database.
+
+#### 5.7.2 Code Injection (XSS)
+
+| Parameter | Detail |
+| --- | --- |
+| Target | Form login pada `/auth/login/` |
+| Payload | `<script>alert(1)</script>` |
+| Status | Gagal dieksploitasi |
+
+Eksploitasi dilakukan untuk mencoba mengeksekusi JavaScript berbahaya. Serangan gagal karena Django Form menolak karakter berbahaya dan Django template engine melakukan HTML escaping pada seluruh output.
+
+#### 5.7.3 Broken Authentication (Brute Force)
+
+| Parameter | Detail |
+| --- | --- |
+| Target | Endpoint login pada `/auth/login/` |
+| Payload | Password salah secara berulang |
+| Status | Gagal dieksploitasi |
+
+Eksploitasi dilakukan dengan mengirimkan password salah secara berulang pada akun `pemilih1`. Serangan gagal karena aplikasi menerapkan rate limiting. Akun dikunci sementara selama 15 menit setelah 5 kali percobaan gagal.
+
+#### 5.7.4 CSRF
+
+| Parameter | Detail |
+| --- | --- |
+| Target | Endpoint logout pada `/auth/logout/` |
+| Payload | POST request tanpa CSRF token |
+| Status | Gagal dieksploitasi |
+
+Eksploitasi dilakukan dengan mengirimkan POST request tanpa CSRF token menggunakan `curl` dan melalui unit test dengan `enforce_csrf_checks=True`.
+
+Pada pengujian via `curl`, request mendapat response `302 Found` karena user belum dalam kondisi login sehingga diredirect ke halaman login sebelum CSRF dicek. Pengujian via unit test dengan user yang sudah login menghasilkan response `403 Forbidden`, membuktikan Django `CsrfViewMiddleware` aktif secara global dan menolak seluruh request tanpa token yang valid.
+
+---
+
+### 5.8 Reporting & Remediation
+
+#### 5.8.1 Rangkuman Temuan
+
+| No | Temuan | Sumber | Risk Level | Status |
+| --- | --- | --- | --- | --- |
+| 1 | Content Security Policy (CSP) Header Not Set | OWASP ZAP | Medium | Perlu diperbaiki |
+| 2 | Sub Resource Integrity Attribute Missing | OWASP ZAP | Medium | Perlu diperbaiki |
+| 3 | Server Leaks Version Information | OWASP ZAP | Low | Perlu diperbaiki |
+| 4 | X-Content-Type-Options Header Missing | OWASP ZAP | Low | Perlu diperbaiki |
+| 5 | SQL Injection | Manual Testing | High | Berhasil dimitigasi |
+| 6 | Code Injection (XSS) | Manual Testing | High | Berhasil dimitigasi |
+| 7 | Broken Authentication (Brute Force) | Manual Testing | High | Berhasil dimitigasi |
+| 8 | CSRF | Manual Testing | High | Berhasil dimitigasi |
+
+#### 5.8.2 Saran Perbaikan
+
+| Temuan | Rekomendasi |
+| --- | --- |
+| CSP Header Not Set | Tambahkan Content Security Policy header pada settings Django untuk membatasi sumber konten yang diizinkan dimuat oleh browser. |
+| Sub Resource Integrity Attribute Missing | Tambahkan atribut `integrity` dan `crossorigin` pada setiap tag `script` dan `link` eksternal yang digunakan. |
+| Server Leaks Version Information | Sembunyikan informasi versi server dengan mengkonfigurasi header response agar tidak menampilkan detail versi WSGIServer dan Python. |
+| X-Content-Type-Options Header Missing | Tambahkan header `X-Content-Type-Options: nosniff` pada response untuk mencegah browser melakukan MIME type sniffing. |
+
+#### 5.8.3 Kesimpulan
+
+Penetration testing terhadap aplikasi E-Voting System SariWangi menunjukkan bahwa implementasi secure coding pada Tugas 3 telah berhasil melindungi aplikasi dari empat jenis serangan utama yaitu **SQL Injection**, **Code Injection (XSS)**, **Broken Authentication**, dan **CSRF**.
+
+Seluruh percobaan eksploitasi berhasil diblokir oleh mekanisme keamanan yang telah diimplementasikan. Terdapat beberapa temuan minor terkait konfigurasi HTTP security headers yang dapat ditingkatkan untuk memperkuat keamanan aplikasi.
 
 ---
 

@@ -1056,7 +1056,7 @@ Seluruh percobaan eksploitasi berhasil diblokir oleh mekanisme keamanan yang tel
 
 ## 6. Video Demo Tugas 4
 
-**Video URL:** *(Tambahkan link YouTube setelah upload)*
+**Video URL:** https://youtu.be/yvX4snojpzU?si=tS-pCtcyv-w_OK35
 
 **Konten Video:**
 1. Prosedur dan hasil Unit Testing

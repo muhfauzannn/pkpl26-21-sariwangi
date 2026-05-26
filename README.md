@@ -819,13 +819,15 @@ Perintah yang digunakan:
 nmap -sV 127.0.0.1
 ```
 
-> **Placeholder Gambar 1:** Hasil scan nmap pada host `127.0.0.1`.
+<img width="2048" height="1324" alt="unnamed (5)" src="https://github.com/user-attachments/assets/9e20ba13-62a2-43a2-8d0c-821b4cc6fd8b" />
+Hasil scan nmap pada host `127.0.0.1`.
 
 Hasil scan menunjukkan aplikasi SariWangi berjalan pada port `8000` menggunakan `WSGIServer 0.2 (Python 3.9.6)`. Port lain yang terdeteksi (`5000`, `5432`, `7000`) merupakan layanan sistem lokal yang tidak berkaitan dengan aplikasi.
 
 #### 5.4.2 OWASP ZAP
 
-> **Placeholder Gambar 2:** Hasil automated scan OWASP ZAP.
+<img width="2048" height="1345" alt="unnamed (6)" src="https://github.com/user-attachments/assets/8a7b3239-95d0-498d-b75c-26ecfa189e00" />
+Hasil automated scan OWASP ZAP.
 
 OWASP ZAP berhasil melakukan automated scan terhadap aplikasi di `http://127.0.0.1:8000` dan mendeteksi **8 alerts** yang akan dibahas lebih lanjut pada tahap Scanning & Enumeration.
 
@@ -877,21 +879,29 @@ Berikut adalah 8 alerts yang ditemukan oleh OWASP ZAP:
 | 7 | User Agent Fuzzer | Informational |
 | 8 | User Controllable HTML Element Attribute (Potential XSS) | Informational |
 
-> **Placeholder Gambar 3:** Alert Content Security Policy (CSP) Header Not Set.
+<img width="2048" height="1330" alt="unnamed (7)" src="https://github.com/user-attachments/assets/bd0ff69a-13bd-4ccf-9bb2-a9937de7203f" />
+Alert Content Security Policy (CSP) Header Not Set.
 
-> **Placeholder Gambar 4:** Alert Sub Resource Integrity Attribute Missing.
+<img width="2048" height="1330" alt="unnamed (8)" src="https://github.com/user-attachments/assets/49d368cd-7b14-414c-9050-843362a6335b" />
+Alert Sub Resource Integrity Attribute Missing.
 
-> **Placeholder Gambar 5:** Alert Server Leaks Version Information.
+<img width="2048" height="1330" alt="unnamed (9)" src="https://github.com/user-attachments/assets/4ae5f9e4-2af4-4202-a874-fcea0d693a91" />
+Alert Server Leaks Version Information.
 
-> **Placeholder Gambar 6:** Alert X-Content-Type-Options Header Missing.
+<img width="2048" height="1330" alt="unnamed (10)" src="https://github.com/user-attachments/assets/e1d8a3e9-e738-41c1-8566-c22ff4f7c21e" />
+Alert X-Content-Type-Options Header Missing.
 
-> **Placeholder Gambar 7:** Alert Authentication Request Identified.
+<img width="2048" height="1330" alt="unnamed (11)" src="https://github.com/user-attachments/assets/e90ee950-a8c6-4c2d-9979-03b474e2ee81" />
+Alert Authentication Request Identified.
 
-> **Placeholder Gambar 8:** Alert Session Management Response Identified.
+<img width="2048" height="1330" alt="unnamed (12)" src="https://github.com/user-attachments/assets/151390ca-580b-4bf5-9db0-b6c24b7791e1" />
+Alert Session Management Response Identified.
 
-> **Placeholder Gambar 9:** Alert User Agent Fuzzer.
+<img width="2048" height="1330" alt="unnamed (13)" src="https://github.com/user-attachments/assets/25ecf15f-1b0a-44ca-bfda-1507a853c6df" />
+Alert User Agent Fuzzer.
 
-> **Placeholder Gambar 10:** Alert User Controllable HTML Element Attribute.
+<img width="2048" height="1330" alt="unnamed (14)" src="https://github.com/user-attachments/assets/4a58dd15-dfe5-46d1-b1f9-5216d7a27d2c" />
+Alert User Controllable HTML Element Attribute.
 
 #### 5.6.2 Hasil Manual Testing
 
@@ -902,15 +912,20 @@ Berikut adalah 8 alerts yang ditemukan oleh OWASP ZAP:
 | 3 | Brute Force | Password salah 6x | `/auth/login/` | Akun dikunci selama 15 menit |
 | 4 | CSRF | POST tanpa CSRF token | `/auth/logout/` | Ditolak dengan response 403 Forbidden saat user sudah login; request `curl` tanpa login mendapat 302 redirect ke halaman login |
 
-> **Placeholder Gambar 11:** SQL Injection attempt diblokir pada form login.
+<img width="2048" height="1330" alt="unnamed (15)" src="https://github.com/user-attachments/assets/1feac09b-c9f8-4377-a349-e7b637089aae" />
+SQL Injection attempt diblokir pada form login.
 
-> **Placeholder Gambar 12:** XSS attempt diblokir pada form login.
+<img width="2048" height="1330" alt="unnamed (16)" src="https://github.com/user-attachments/assets/4ec7947b-7e94-48ed-b20a-2708ac2b6dd0" />
+XSS attempt diblokir pada form login.
 
-> **Placeholder Gambar 13a:** Percobaan login gagal dengan pesan "Username atau password salah".
+<img width="2048" height="1330" alt="unnamed (17)" src="https://github.com/user-attachments/assets/e6ba88d6-e944-4002-ad7a-31d6a9f8ecc2" />
+Percobaan login gagal dengan pesan "Username atau password salah".
 
-> **Placeholder Gambar 13b:** Akun dikunci setelah 5 kali percobaan login gagal.
+<img width="2048" height="1330" alt="unnamed (18)" src="https://github.com/user-attachments/assets/76841b55-78dd-4bd0-aeb2-97112ee07b41" />
+Akun dikunci setelah 5 kali percobaan login gagal.
 
-> **Placeholder Gambar 14:** CSRF test via curl, response 302 Found.
+<img width="1528" height="628" alt="unnamed (19)" src="https://github.com/user-attachments/assets/bc202003-6fe3-41b8-9b94-af5cdcfd5419" />
+CSRF test via curl, response 302 Found.
 
 ---
 
